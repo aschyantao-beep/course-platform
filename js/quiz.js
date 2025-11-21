@@ -6029,7 +6029,32 @@ class QuizManager {
         this.currentQuestionIndex = 0;
         this.questionsPerPage = 10;
         this.currentPage = 1;
+        this.currentCourseId = this.getCurrentCourseId();
         this.init();
+    }
+
+    // 获取当前课程ID
+    getCurrentCourseId() {
+        // 1. 从URL参数获取
+        const urlParams = new URLSearchParams(window.location.search);
+        let courseId = urlParams.get('courseId');
+
+        if (courseId) {
+            return courseId;
+        }
+
+        // 2. 从localStorage获取之前学习的课程
+        const currentCourse = localStorage.getItem('currentLearningCourse');
+        if (currentCourse && currentCourse !== 'null') {
+            // 移除course前缀，只保留数字
+            const courseMatch = currentCourse.match(/course(\d+)/);
+            if (courseMatch) {
+                return courseMatch[1];
+            }
+        }
+
+        // 3. 默认返回第一个课程
+        return '1';
     }
 
     init() {
@@ -6050,6 +6075,11 @@ class QuizManager {
         this.currentQuiz = quizData[courseId];
         this.userAnswers = [];
         this.currentQuestionIndex = 0;
+
+        // 记录测验开始时间
+        this.quizStartTime = Date.now();
+
+        console.log('开始测验课程:', courseId, '题目数量:', this.currentQuiz ? this.currentQuiz.length : 0);
         
         if (!this.currentQuiz || this.currentQuiz.length === 0) {
             this.showError('该课程暂无测验题目');
@@ -6677,36 +6707,76 @@ class QuizManager {
     
     saveQuizResult(resultData) {
         try {
-            // 获取现有的答题结果数据
-            let quizResults = JSON.parse(localStorage.getItem('quizResults') || '{}');
-            
-            // 如果该课程还没有记录，创建一个空数组
-            if (!quizResults[resultData.courseId]) {
-                quizResults[resultData.courseId] = [];
-            }
-            
-            // 添加用户信息和时间戳
+            // 添加用户信息、时间戳和测验时间
             const completeResult = {
                 ...resultData,
                 userId: this.getCurrentUserId(),
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                timeSpent: this.getQuizTimeSpent()
             };
-            
-            // 将新结果添加到数组开头
-            quizResults[resultData.courseId].unshift(completeResult);
-            
-            // 只保留最近10次结果
-            if (quizResults[resultData.courseId].length > 10) {
-                quizResults[resultData.courseId] = quizResults[resultData.courseId].slice(0, 10);
-            }
-            
-            // 保存到localStorage
-            localStorage.setItem('quizResults', JSON.stringify(quizResults));
-            
+
+            // 保存到本地存储
+            this.saveToLocalStorage(completeResult);
+
+            // 同时保存到云端（如果用户已登录）
+            this.saveToSupabase(completeResult);
+
             console.log('答题结果已保存:', completeResult);
         } catch (error) {
             console.error('保存答题结果失败:', error);
         }
+    }
+
+    // 保存到本地存储
+    saveToLocalStorage(resultData) {
+        let quizResults = JSON.parse(localStorage.getItem('quizResults') || '{}');
+
+        if (!quizResults[resultData.courseId]) {
+            quizResults[resultData.courseId] = [];
+        }
+
+        quizResults[resultData.courseId].unshift(resultData);
+
+        // 每个课程最多保留10条记录
+        if (quizResults[resultData.courseId].length > 10) {
+            quizResults[resultData.courseId] = quizResults[resultData.courseId].slice(0, 10);
+        }
+
+        localStorage.setItem('quizResults', JSON.stringify(quizResults));
+    }
+
+    // 保存到Supabase云端
+    async saveToSupabase(resultData) {
+        try {
+            if (window.dataManager && window.dataManager.auth.currentUser) {
+                const quizData = {
+                    courseId: resultData.courseId,
+                    totalQuestions: resultData.totalQuestions,
+                    correctAnswers: resultData.correctAnswers,
+                    score: resultData.score,
+                    timeSpent: resultData.timeSpent || 0
+                };
+
+                const result = await window.dataManager.saveQuizResult(quizData);
+                if (result.success) {
+                    console.log('答题结果已同步到云端:', result);
+                } else {
+                    console.error('云端同步失败:', result.error);
+                }
+            } else {
+                console.log('用户未登录，数据仅保存在本地');
+            }
+        } catch (error) {
+            console.error('保存到云端失败:', error);
+        }
+    }
+
+    // 计算测验花费时间
+    getQuizTimeSpent() {
+        if (this.quizStartTime) {
+            return Math.round((Date.now() - this.quizStartTime) / 1000); // 秒
+        }
+        return 0;
     }
     
     getCurrentUserId() {

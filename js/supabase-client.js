@@ -601,16 +601,54 @@ class LearningTrackerWithSupabase {
 
 // 在页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
-    // 替换原有的 LearningTracker
-    if (typeof window.LearningTracker !== 'undefined') {
-        window.LearningTracker = LearningTrackerWithSupabase;
-    }
-
-    // 初始化新的学习追踪器
-    if (typeof window.learningTracker === 'undefined') {
-        window.learningTracker = new LearningTrackerWithSupabase();
-    }
+    // 等待原有的学习追踪器初始化完成
+    setTimeout(() => {
+        // 如果原有的学习追踪器已经存在，则增强它
+        if (typeof window.learningTracker !== 'undefined') {
+            // 增强原有的学习追踪器，添加Supabase同步功能
+            enhanceLearningTracker();
+        } else {
+            // 如果不存在，则创建新的增强版追踪器
+            window.learningTracker = new LearningTrackerWithSupabase();
+        }
+    }, 1000);
 });
+
+// 增强原有的学习追踪器
+function enhanceLearningTracker() {
+    const originalTracker = window.learningTracker;
+    const dataManager = window.dataManager;
+
+    // 重写保存学习会话的方法，添加云端同步
+    const originalSaveMethod = originalTracker.saveLearningSession.bind(originalTracker);
+    originalTracker.saveLearningSession = function(duration, isComplete) {
+        // 先执行原有的本地保存
+        originalSaveMethod(duration, isComplete);
+
+        // 然后尝试保存到云端
+        if (dataManager && dataManager.auth.currentUser) {
+            try {
+                const sessionData = {
+                    courseId: this.currentCourseId,
+                    pageInfo: this.currentPage,
+                    startTime: this.startTime,
+                    endTime: Date.now(),
+                    duration: duration,
+                    isComplete: isComplete,
+                    timestamp: Date.now()
+                };
+
+                dataManager.auth.saveLearningSession(sessionData);
+                console.log('学习时长已同步到云端:', sessionData);
+            } catch (error) {
+                console.error('同步到云端失败:', error);
+            }
+        } else {
+            // 用户未登录，数据会保存在本地，等用户登录后再同步
+            console.log('用户未登录，数据保存在本地');
+        }
+    };
+}
 
 // 导出到全局
 window.SupabaseAuth = SupabaseAuth;
