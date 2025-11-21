@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课后测验 - 海外运营培训课程教学平台</title>
+    <link rel="stylesheet" href="css/style.css?v=1.1">
+    <link rel="stylesheet" href="css/quiz.css?v=1.1">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="logo">海外运营培训课程</h1>
+                <ul class="nav-menu">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="index.html#courses">课程</a></li>
+                    <li><a href="quiz.html" class="active">课后测验</a></li>
+                    <li><a href="admin/login.html" class="admin-link">管理员登录</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="quiz-section">
+            <div class="container">
+                <h2 class="section-title">课后测验</h2>
+                <div class="course-select">
+                    <label for="course-selector">选择课程：</label>
+                    <select id="course-selector">
+                        <option value="">请选择课程...</option>
+                        <option value="1">业务职责&学员生命周期</option>
+                        <option value="2">学员管理&业务绩效&产品规则</option>
+                        <option value="3">下标逻辑&学员权益</option>
+                        <option value="4">运营定位&目标拆解&围场运营</option>
+                        <option value="5">排兵案例</option>
+                        <option value="6">促销管理PDCA</option>
+                        <option value="7">促销管理实操</option>
+                        <option value="8">激励管理</option>
+                        <option value="9">新建组SOP&会议管理</option>
+                        <option value="10">数据看板</option>
+                    </select>
+                </div>
+                <div class="quiz-progress" id="quiz-progress">
+                    <div class="progress-text">第 <span id="current-question">0</span>/50 题</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div id="quiz-container" class="quiz-container">
+                    <!-- 测验内容将通过JavaScript动态加载 -->
+                </div>
+                <div class="quiz-navigation" id="quiz-navigation">
+                    <button class="nav-button" id="prev-page" disabled>上一页</button>
+                    <span class="page-info">第 <span id="current-page">1</span>/5 页</span>
+                    <button class="nav-button" id="next-page" disabled>下一页</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 海外运营培训课程教学平台. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/learning-tracker.js"></script>
+    <script src="js/quiz.js?v=1.2"></script>
+</body>
+</html>

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程详情 - 现代Web开发实战</title>
+    <link rel="stylesheet" href="css/course-detail.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>学习平台</h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="courses.html">课程</a></li>
+                <li><a href="contact.html">联系我们</a></li>
+            </ul>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 课程英雄区域 -->
+    <section class="course-hero">
+        <div class="container">
+            <div class="course-info">
+                <div class="course-meta">
+                    <span class="course-category">Web开发</span>
+                    <span class="course-level">中级</span>
+                    <span class="course-duration">12小时</span>
+                </div>
+                <h1 class="course-title">现代Web开发实战：从入门到精通</h1>
+                <p class="course-description">
+                    掌握现代Web开发的核心技术，包括HTML5、CSS3、JavaScript、React等前沿技术栈。
+                    通过实战项目，快速成长为全栈开发工程师。
+                </p>
+                <div class="course-stats">
+                    <div class="stat">
+                        <i class="fas fa-users"></i>
+                        <span>2,847名学生</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-star"></i>
+                        <span>4.8分 (423评价)</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-certificate"></i>
+                        <span>含证书</span>
+                    </div>
+                </div>
+            </div>
+            <div class="course-video-container">
+                <div class="video-player">
+                    <video id="courseVideo" controls poster="images/course-poster.jpg">
+                        <source src="videos/lesson1-intro.mp4" type="video/mp4">
+                        <p>您的浏览器不支持视频播放。请 <a href="videos/lesson1-intro.mp4">下载视频</a> 观看。</p>
+                    </video>
+                    <div class="video-controls">
+                        <button class="play-btn" id="playBtn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="video-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="videoProgress"></div>
+                            </div>
+                            <span class="time-display">
+                                <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                            </span>
+                        </div>
+                        <div class="video-volume">
+                            <i class="fas fa-volume-up"></i>
+                            <input type="range" id="volumeSlider" min="0" max="100" value="100">
+                        </div>
+                        <button class="fullscreen-btn" id="fullscreenBtn">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 学习进度区域 -->
+    <section class="learning-progress-section">
+        <div class="container">
+            <div class="progress-overview">
+                <h2>您的学习进度</h2>
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <h3>课程完成度</h3>
+                        <div class="progress-stats">
+                            <div class="stat">
+                                <span class="stat-number" id="videosWatched">15</span>
+                                <span class="stat-label">已看视频</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number" id="exercisesCompleted">8</span>
+                                <span class="stat-label">已完成练习</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number" id="quizzesPassed">5</span>
+                                <span class="stat-label">已通过测验</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-main">
+                        <div class="progress-circle">
+                            <svg class="progress-ring" width="120" height="120">
+                                <circle
+                                    class="progress-ring__circle"
+                                    stroke="#e0e0e0"
+                                    stroke-width="8"
+                                    fill="transparent"
+                                    r="52"
+                                    cx="60"
+                                    cy="60"/>
+                                <circle
+                                    class="progress-ring__circle"
+                                    stroke="#667eea"
+                                    stroke-width="8"
+                                    fill="transparent"
+                                    r="52"
+                                    cx="60"
+                                    cy="60"/>
+                            </svg>
+                            <div class="progress-text">
+                                <span class="progress-percentage" id="totalProgress">75%</span>
+                                <span class="progress-label">总体进度</span>
+                            </div>
+                        </div>
+                        <div class="progress-details">
+                            <div class="progress-bar-container">
+                                <div class="progress-item">
+                                    <span class="progress-label">视频学习进度</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="videosProgress" style="width: 75%"></div>
+                                    </div>
+                                    <span class="progress-value">
+                                        <span id="videosWatched">15</span>/<span id="totalVideos">20</span>
+                                    </span>
+                                </div>
+                                <div class="progress-item">
+                                    <span class="progress-label">练习完成进度</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="exercisesProgress" style="width: 80%"></div>
+                                    </div>
+                                    <span class="progress-value">
+                                        <span id="exercisesCompleted">8</span>/<span id="totalExercises">10</span>
+                                    </span>
+                                </div>
+                                <div class="progress-item">
+                                    <span class="progress-label">测验通过进度</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="quizzesProgress" style="width: 83%"></div>
+                                    </div>
+                                    <span class="progress-value">
+                                        <span id="quizzesPassed">5</span>/<span id="totalQuizzes">6</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 课程内容区域 -->
+    <section class="course-content">
+        <div class="container">
+            <div class="content-wrapper">
+                <main class="main-content">
+                    <div class="course-tabs">
+                        <button class="tab-btn active" data-tab="overview">课程概述</button>
+                        <button class="tab-btn" data-tab="curriculum">课程大纲</button>
+                        <button class="tab-btn" data-tab="instructor">讲师介绍</button>
+                        <button class="tab-btn" data-tab="reviews">学员评价</button>
+                    </div>
+
+                    <div class="tab-content active" id="overview">
+                        <h2>课程介绍</h2>
+                        <p>本课程将带你深入现代Web开发的核心技术，从基础的HTML5、CSS3到高级的JavaScript框架React，通过实战项目让你快速掌握全栈开发技能。</p>
+                        
+                        <h3>你将学到什么</h3>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> 掌握HTML5语义化标签和CSS3高级特性</li>
+                            <li><i class="fas fa-check"></i> 深入理解JavaScript ES6+新特性</li>
+                            <li><i class="fas fa-check"></i> 学习React组件化开发思想</li>
+                            <li><i class="fas fa-check"></i> 掌握现代前端工具和构建流程</li>
+                            <li><i class="fas fa-check"></i> 实战项目经验积累</li>
+                        </ul>
+
+                        <h3>课程要求</h3>
+                        <ul class="requirement-list">
+                            <li>基本的HTML、CSS和JavaScript知识</li>
+                            <li>一台能够运行现代浏览器的电脑</li>
+                            <li>学习的热情和耐心</li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-content" id="curriculum">
+                        <h2>课程大纲</h2>
+                        <div class="curriculum-list">
+                            <div class="curriculum-section">
+                                <div class="section-header">
+                                    <h3>第一章：HTML5基础</h3>
+                                    <span class="section-duration">2小时</span>
+                                </div>
+                                <div class="section-lessons">
+                                    <div class="lesson-item completed">
+                                        <div class="lesson-info">
+                                            <i class="fas fa-play-circle"></i>
+                                            <span>1.1 HTML5新特性介绍</span>
+                                            <span class="lesson-duration">15分钟</span>
+                                        </div>
+                                        <div class="lesson-status">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="lesson-item completed">
+                                        <div class="lesson-info">
+                                            <i class="fas fa-play-circle"></i>
+                                            <span>1.2 语义化标签详解</span>
+                                            <span class="lesson-duration">20分钟</span>
+                                        </div>
+                                        <div class="lesson-status">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <div class="lesson-info">
+                                            <i class="fas fa-play-circle"></i>
+                                            <span>1.3 表单元素和验证</span>
+                                            <span class="lesson-duration">25分钟</span>
+                                        </div>
+                                        <div class="lesson-status">
+                                            <i class="far fa-circle"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="curriculum-section">
+                                <div class="section-header">
+                                    <h3>第二章：CSS3高级特性</h3>
+                                    <span class="section-duration">2.5小时</span>
+                                </div>
+                                <div class="section-lessons">
+                                    <div class="lesson-item">
+                                        <div class="lesson-info">
+                                            <i class="fas fa-play-circle"></i>
+                                            <span>2.1 Flexbox布局详解</span>
+                                            <span class="lesson-duration">30分钟</span>
+                                        </div>
+                                        <div class="lesson-status">
+                                            <i class="far fa-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <div class="lesson-info">
+                                            <i class="fas fa-play-circle"></i>
+                                            <span>2.2 Grid布局实战</span>
+                                            <span class="lesson-duration">35分钟</span>
+                                        </div>
+                                        <div class="lesson-status">
+                                            <i class="far fa-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <div class="lesson-info">
+                                            <i class="fas fa-play-circle"></i>
+                                            <span>2.3 CSS动画和过渡</span>
+                                            <span class="lesson-duration">25分钟</span>
+                                        </div>
+                                        <div class="lesson-status">
+                                            <i class="far fa-circle"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="curriculum-section">
+                                <div class="section-header">
+                                    <h3>第三章：JavaScript ES6+</h3>
+                                    <span class="section-duration">3小时</span>
+                                </div>
+                                <div class="section-lessons">
+                                    <div class="lesson-item">
+                                        <div class="lesson-info">
+                                            <i class="fas fa-play-circle"></i>
+                                            <span>3.1 ES6新特性详解</span>
+                                            <span class="lesson-duration">40分钟</span>
+                                        </div>
+                                        <div class="lesson-status">
+                                            <i class="far fa-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <div class="lesson-info">
+                                            <i class="fas fa-play-circle"></i>
+                                            <span>3.2 异步编程Promise</span>
+                                            <span class="lesson-duration">45分钟</span>
+                                        </div>
+                                        <div class="lesson-status">
+                                            <i class="far fa-circle"></i>
+                                        </div>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <div class="lesson-info">
+                                            <i class="fas fa-play-circle"></i>
+                                            <span>3.3 模块化开发</span>
+                                            <span class="lesson-duration">35分钟</span>
+                                        </div>
+                                        <div class="lesson-status">
+                                            <i class="far fa-circle"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="instructor">
+                        <h2>讲师介绍</h2>
+                        <div class="instructor-profile">
+                            <div class="instructor-avatar">
+                                <img src="images/instructor-avatar.jpg" alt="张教授">
+                            </div>
+                            <div class="instructor-info">
+                                <h3>张教授</h3>
+                                <p class="instructor-title">资深前端开发专家 | 10年开发经验</p>
+                                <p class="instructor-bio">
+                                    张教授拥有超过10年的Web开发经验，曾在多家知名科技公司担任技术负责人。
+                                    精通现代前端技术栈，包括React、Vue、Angular等主流框架。
+                                    已帮助超过10,000名学生成功转型为前端开发工程师。
+                                </p>
+                                <div class="instructor-stats">
+                                    <div class="stat">
+                                        <span class="stat-number">50+</span>
+                                        <span class="stat-label">课程数量</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-number">10,000+</span>
+                                        <span class="stat-label">学生数量</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-number">4.9</span>
+                                        <span class="stat-label">平均评分</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="reviews">
+                        <h2>学员评价</h2>
+                        <div class="reviews-summary">
+                            <div class="rating-overview">
+                                <div class="rating-number">4.8</div>
+                                <div class="rating-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <div class="rating-count">423个评价</div>
+                            </div>
+                            <div class="rating-bars">
+                                <div class="rating-bar">
+                                    <span>5星</span>
+                                    <div class="bar">
+                                        <div class="bar-fill" style="width: 75%"></div>
+                                    </div>
+                                    <span>75%</span>
+                                </div>
+                                <div class="rating-bar">
+                                    <span>4星</span>
+                                    <div class="bar">
+                                        <div class="bar-fill" style="width: 20%"></div>
+                                    </div>
+                                    <span>20%</span>
+                                </div>
+                                <div class="rating-bar">
+                                    <span>3星</span>
+                                    <div class="bar">
+                                        <div class="bar-fill" style="width: 4%"></div>
+                                    </div>
+                                    <span>4%</span>
+                                </div>
+                                <div class="rating-bar">
+                                    <span>2星</span>
+                                    <div class="bar">
+                                        <div class="bar-fill" style="width: 1%"></div>
+                                    </div>
+                                    <span>1%</span>
+                                </div>
+                                <div class="rating-bar">
+                                    <span>1星</span>
+                                    <div class="bar">
+                                        <div class="bar-fill" style="width: 0%"></div>
+                                    </div>
+                                    <span>0%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="reviews-list">
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="reviewer-info">
+                                        <img src="images/avatar1.jpg" alt="学员头像" class="reviewer-avatar">
+                                        <div>
+                                            <h4>李明</h4>
+                                            <span class="review-date">2024年1月15日</span>
+                                        </div>
+                                    </div>
+                                    <div class="review-rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                                <p class="review-content">
+                                    非常棒的课程！内容深入浅出，实战项目很有价值。老师讲解清晰，
+                                    让我从零基础成功转型为前端开发者。强烈推荐给想学习Web开发的朋友！
+                                </p>
+                            </div>
+                            
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="reviewer-info">
+                                        <img src="images/avatar2.jpg" alt="学员头像" class="reviewer-avatar">
+                                        <div>
+                                            <h4>王小花</h4>
+                                            <span class="review-date">2024年1月10日</span>
+                                        </div>
+                                    </div>
+                                    <div class="review-rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                                <p class="review-content">
+                                    课程结构合理，从基础到进阶循序渐进。特别喜欢实战项目部分，
+                                    让我真正理解了如何将这些技术应用到实际工作中。老师的答疑也很及时。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <aside class="sidebar">
+                    <div class="course-price">
+                        <div class="price-info">
+                            <span class="current-price">¥299</span>
+                            <span class="original-price">¥599</span>
+                            <span class="discount-badge">50% OFF</span>
+                        </div>
+                        <button class="enroll-btn">立即报名</button>
+                        <p class="guarantee">30天无条件退款保证</p>
+                    </div>
+
+                    <div class="course-includes">
+                        <h3>课程包含</h3>
+                        <ul>
+                            <li><i class="fas fa-video"></i> 12小时高清视频</li>
+                            <li><i class="fas fa-file-alt"></i> 50个练习题</li>
+                            <li><i class="fas fa-download"></i> 可下载资源</li>
+                            <li><i class="fas fa-certificate"></i> 完成证书</li>
+                            <li><i class="fas fa-mobile-alt"></i> 移动端访问</li>
+                            <li><i class="fas fa-infinity"></i> 终身访问权限</li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>学习平台</h3>
+                    <p>提供高质量的在线课程，助力您的职业发展。</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                        <a href="#"><i class="fab fa-qq"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>课程分类</h4>
+                    <ul>
+                        <li><a href="#">前端开发</a></li>
+                        <li><a href="#">后端开发</a></li>
+                        <li><a href="#">移动开发</a></li>
+                        <li><a href="#">数据科学</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>支持</h4>
+                    <ul>
+                        <li><a href="#">帮助中心</a></li>
+                        <li><a href="#">联系我们</a></li>
+                        <li><a href="#">常见问题</a></li>
+                        <li><a href="#">退款政策</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>联系我们</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> support@learning.com</li>
+                        <li><i class="fas fa-phone"></i> 400-123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 北京市朝阳区</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 学习平台. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Supabase 客户端 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <!-- 认证和数据管理 -->
+    <script src="js/supabase-client.js"></script>
+    <script src="js/auth-ui.js"></script>
+    <!-- 原有的脚本保持不变 -->
+    <script src="js/learning-tracker.js"></script>
+    <script src="js/course-detail.js"></script>
+</body>
+</html>

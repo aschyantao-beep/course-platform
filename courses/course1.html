@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第一期：基础入门 - 海外运营培训课程教学平台</title>
+    <link rel="stylesheet" href="../css/course-detail.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="../index.html" class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    海外运营培训课程
+                </a>
+                <ul class="nav-menu">
+                    <li><a href="../index.html">首页</a></li>
+                    <li><a href="../index.html#courses">课程列表</a></li>
+                    <li><a href="../quiz.html">课后测验</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- 课程视频区域 -->
+        <section class="video-section">
+            <div class="container">
+                <div class="video-container">
+                    <video controls poster="../images/course1-video.jpg">
+                        <source src="../videos/course1-intro.mp4" type="video/mp4">
+                        <source src="../videos/course1-intro.webm" type="video/webm">
+                        您的浏览器不支持视频播放，请更新浏览器版本。
+                    </video>
+                    <div class="video-overlay">
+                        <h1>第一期：基础入门</h1>
+                        <p class="video-subtitle">从零开始，掌握基础知识与技能</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 学习进度区域 -->
+        <section class="progress-main-section">
+            <div class="container">
+                <div class="progress-content">
+                    <h2><i class="fas fa-chart-line"></i> 学习进度</h2>
+                    <div id="progress-container">
+                        <div class="progress-info">
+                            <span class="progress-percentage">0%</span>
+                            <span class="progress-text">尚未开始学习</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-milestones">
+                            <div class="milestone">
+                                <div class="milestone-dot"></div>
+                                <div class="milestone-label">开始</div>
+                            </div>
+                            <div class="milestone">
+                                <div class="milestone-dot"></div>
+                                <div class="milestone-label">25%</div>
+                            </div>
+                            <div class="milestone">
+                                <div class="milestone-dot"></div>
+                                <div class="milestone-label">50%</div>
+                            </div>
+                            <div class="milestone">
+                                <div class="milestone-dot"></div>
+                                <div class="milestone-label">75%</div>
+                            </div>
+                            <div class="milestone">
+                                <div class="milestone-dot"></div>
+                                <div class="milestone-label">完成</div>
+                            </div>
+                        </div>
+                        <div class="progress-actions">
+                            <button class="progress-btn" id="decrease-progress" title="减少进度">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button class="progress-btn" id="increase-progress" title="增加进度">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="progress-btn complete-btn" id="complete-course" title="完成课程">
+                                <i class="fas fa-check"></i>
+                                完成
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="course-hero">
+            <div class="container">
+                <div class="course-info">
+                    <h1>第一期：基础入门</h1>
+                    <p class="course-subtitle">从零开始，掌握基础知识与技能</p>
+                    <div class="course-meta">
+                        <span><i class="fas fa-clock"></i> 课程时长：4周</span>
+                        <span><i class="fas fa-users"></i> 难度级别：初级</span>
+                        <span><i class="fas fa-calendar"></i> 开课时间：随时开始</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="course-content">
+            <div class="container">
+                <div class="content-grid">
+                    <div class="main-content">
+                        <div class="course-description">
+                            <h2>课程介绍</h2>
+                            <p>
+                                本课程专为零基础学员设计，通过系统化的学习路径，帮助您快速掌握核心基础知识。
+                                从最基本的概念开始，循序渐进地引导您进入专业领域。
+                            </p>
+                            <p>
+                                无论您是完全的新手，还是想要巩固基础的学员，本课程都能为您提供清晰的学习框架和实用的技能指导。
+                            </p>
+                        </div>
+
+                        <div class="course-outline">
+                            <h2>课程大纲</h2>
+                            <div class="outline-items">
+                                <div class="outline-item">
+                                    <div class="week-number">第1周</div>
+                                    <div class="week-content">
+                                        <h3>基础概念入门</h3>
+                                        <ul>
+                                            <li>了解行业背景和发展趋势</li>
+                                            <li>掌握基本术语和概念</li>
+                                            <li>熟悉常用工具和环境</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="outline-item">
+                                    <div class="week-number">第2周</div>
+                                    <div class="week-content">
+                                        <h3>核心技能学习</h3>
+                                        <ul>
+                                            <li>深入学习核心原理</li>
+                                            <li>实践基础操作技巧</li>
+                                            <li>完成第一个小项目</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="outline-item">
+                                    <div class="week-number">第3周</div>
+                                    <div class="week-content">
+                                        <h3>进阶应用</h3>
+                                        <ul>
+                                            <li>掌握高级功能和技巧</li>
+                                            <li>学习最佳实践方法</li>
+                                            <li>解决常见问题</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="outline-item">
+                                    <div class="week-number">第4周</div>
+                                    <div class="week-content">
+                                        <h3>综合项目实战</h3>
+                                        <ul>
+                                            <li>完成综合实践项目</li>
+                                            <li>总结学习成果</li>
+                                            <li>制定后续学习计划</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="learning-objectives">
+                            <h2>学习目标</h2>
+                            <ul class="objectives-list">
+                                <li>掌握基础概念和术语</li>
+                                <li>熟练使用核心工具和方法</li>
+                                <li>能够独立完成基础任务</li>
+                                <li>建立系统化的知识框架</li>
+                                <li>具备继续学习的坚实基础</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <aside class="sidebar">
+                        <div class="course-card">
+                            <div class="card-content">
+                                <h3>课程信息</h3>
+                                <ul class="info-list">
+                                    <li><strong>课程时长：</strong>4周</li>
+                                    <li><strong>难度级别：</strong>初级</li>
+                                    <li><strong>适合人群：</strong>零基础学员</li>
+                                    <li><strong>学习方式：</strong>在线学习</li>
+                                    <li><strong>支持设备：</strong>电脑、手机、平板</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="enrollment-section">
+                            <h3>开始学习</h3>
+                            <p>立即加入课程，开启您的学习之旅</p>
+                            <button class="enroll-btn" onclick="startLearning()">
+                                <i class="fas fa-play"></i>
+                                立即开始学习
+                            </button>
+                        </div>
+
+                        <div class="navigation">
+                            <h3>课程导航</h3>
+                            <div class="nav-buttons">
+                                <a href="../index.html" class="nav-btn">
+                                    <i class="fas fa-home"></i>
+                                    返回首页
+                                </a>
+                                <a href="course2.html" class="nav-btn next">
+                                    <i class="fas fa-arrow-right"></i>
+                                    下一课：进阶提升
+                                </a>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <!-- 课程测验部分 -->
+        <section class="course-quiz">
+            <div class="container">
+                <h2>课程测验</h2>
+                <p class="quiz-intro">完成以下测验，检验您对本课程内容的掌握程度。</p>
+                
+                <div class="quiz-container">
+                    <div class="quiz-question" data-question="1">
+                        <h3>问题 1：什么是本课程的学习周期？</h3>
+                        <div class="quiz-options">
+                            <div class="option">
+                                <input type="radio" id="q1-a" name="q1" value="a">
+                                <label for="q1-a">2周</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q1-b" name="q1" value="b">
+                                <label for="q1-b">3周</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q1-c" name="q1" value="c">
+                                <label for="q1-c">4周</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q1-d" name="q1" value="d">
+                                <label for="q1-d">6周</label>
+                            </div>
+                        </div>
+                        <div class="feedback" id="feedback-q1"></div>
+                    </div>
+
+                    <div class="quiz-question" data-question="2">
+                        <h3>问题 2：本课程的难度级别是什么？</h3>
+                        <div class="quiz-options">
+                            <div class="option">
+                                <input type="radio" id="q2-a" name="q2" value="a">
+                                <label for="q2-a">初级</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q2-b" name="q2" value="b">
+                                <label for="q2-b">中级</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q2-c" name="q2" value="c">
+                                <label for="q2-c">高级</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q2-d" name="q2" value="d">
+                                <label for="q2-d">专家</label>
+                            </div>
+                        </div>
+                        <div class="feedback" id="feedback-q2"></div>
+                    </div>
+
+                    <div class="quiz-question" data-question="3">
+                        <h3>问题 3：第三周的主要内容是什么？</h3>
+                        <div class="quiz-options">
+                            <div class="option">
+                                <input type="radio" id="q3-a" name="q3" value="a">
+                                <label for="q3-a">基础概念入门</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q3-b" name="q3" value="b">
+                                <label for="q3-b">核心技能学习</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q3-c" name="q3" value="c">
+                                <label for="q3-c">进阶应用</label>
+                            </div>
+                            <div class="option">
+                                <input type="radio" id="q3-d" name="q3" value="d">
+                                <label for="q3-d">综合项目实战</label>
+                            </div>
+                        </div>
+                        <div class="feedback" id="feedback-q3"></div>
+                    </div>
+
+                    <button class="submit-quiz" id="submit-quiz">提交答案</button>
+                    <div class="quiz-results" id="quiz-results">
+                        <h3>测验结果</h3>
+                        <p>正确答案: <span id="correct-count">0</span>/3</p>
+                        <div class="progress-bar">
+                            <div class="progress" id="quiz-progress"></div>
+                        </div>
+                        <button class="retry-quiz" id="retry-quiz">重新测验</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 海外运营培训课程教学平台. 保留所有权利.</p>
+        </div>
+    </footer>
+
+    <script src="../js/course-detail.js"></script>
+    <script src="../js/course-progress.js"></script>
+</body>
+</html>

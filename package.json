@@ -1,0 +1,29 @@
+{
+  "name": "course-platform",
+  "version": "1.0.0",
+  "description": "海外运营培训课程教学网站",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "build": "echo 'Build complete - static files ready'",
+    "preview": "python -m http.server 8000"
+  },
+  "keywords": [
+    "education",
+    "courses",
+    "learning-platform",
+    "supabase",
+    "vercel"
+  ],
+  "author": "aschyantao-beep",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aschyantao-beep/course-platform.git"
+  },
+  "homepage": "https://github.com/aschyantao-beep/course-platform#readme",
+  "devDependencies": {
+    "vercel": "^28.4.0"
+  }
+}

@@ -1,0 +1,115 @@
+海外运营培训课程教学网站 - 完整文件清单
+==============================================
+
+生成时间: 2024年
+项目路径: c:\Users\liuyiqin001\Desktop\课程教学网站
+
+核心页面文件 (必需)
+-------------------
+✓ index.html                    - 网站首页 [重要]
+✓ course-detail.html            - 课程详情页模板 [重要]
+✓ quiz.html                     - 在线测验页面 [重要]
+
+管理后台文件 (admin/)
+--------------------
+✓ admin/login.html              - 管理员登录页 [重要]
+✓ admin/dashboard.html          - 管理员仪表板 [重要]
+✓ admin/js/admin-login.js       - 登录功能脚本 [重要]
+✓ admin/js/dashboard.js         - 仪表板脚本 [重要]
+
+课程页面文件 (courses/)
+----------------------
+✓ courses/course1.html          - 第1门课程页面
+✓ courses/course2.html          - 第2门课程页面
+✓ courses/course3.html          - 第3门课程页面
+✓ courses/course4.html          - 第4门课程页面
+✓ courses/course5.html          - 第5门课程页面
+✓ courses/course6.html          - 第6门课程页面
+✓ courses/course7.html          - 第7门课程页面
+✓ courses/course8.html          - 第8门课程页面
+✓ courses/course9.html          - 第9门课程页面
+✓ courses/course10.html         - 第10门课程页面
+
+样式文件 (css/)
+--------------
+✓ css/style.css                 - 主要网站样式 [重要]
+✓ css/admin.css                 - 管理后台样式 [重要]
+✓ css/course-detail.css         - 课程详情页样式
+✓ css/quiz.css                  - 测验页面样式
+
+JavaScript功能文件 (js/)
+-----------------------
+✓ js/main.js                    - 主要功能脚本 [重要]
+✓ js/course-detail.js           - 课程详情交互
+✓ js/course-progress.js         - 进度跟踪功能
+✓ js/learning-timer.js          - 学习计时器
+✓ js/learning-tracker.js        - 学习行为追踪
+✓ js/quiz.js                    - 测验系统逻辑 [重要]
+
+图片资源文件 (assets/)
+---------------------
+✓ assets/course1.jpg            - 第1门课程封面图
+✓ assets/course2.jpg            - 第2门课程封面图
+✓ assets/course3.jpg            - 第3门课程封面图
+✓ assets/course4.jpg            - 第4门课程封面图
+✓ assets/course5.jpg            - 第5门课程封面图
+✓ assets/course6.jpg            - 第6门课程封面图
+✓ assets/course7.jpg            - 第7门课程封面图
+✓ assets/course8.jpg            - 第8门课程封面图
+✓ assets/course9.jpg            - 第9门课程封面图
+✓ assets/course10.jpg           - 第10门课程封面图
+
+空目录 (预留扩展)
+----------------
+□ images/                       - 其他图片资源目录 [空]
+□ public/                       - 公共资源目录 [空]
+□ src/                          - 源代码目录 [空]
+
+项目文档 (新增)
+--------------
+✓ 项目说明文档.md               - 详细项目说明 [重要]
+✓ 文件清单.txt                  - 本文件清单 [重要]
+
+文件统计
+--------
+总文件数: 32个
+- HTML文件: 14个
+- CSS文件: 4个
+- JavaScript文件: 6个
+- 图片文件: 10个
+- 文档文件: 2个
+- 空目录: 3个
+
+备份建议
+--------
+[高优先级] - 标记为[重要]的文件必须备份
+[中优先级] - 所有课程相关文件(courses/, assets/)
+[低优先级] - 空目录可以不备份
+
+部署检查清单
+-----------
+□ 确认所有HTML文件可以正常打开
+□ 确认所有CSS样式文件加载正常
+□ 确认所有JavaScript功能正常工作
+□ 确认所有图片资源可以正常显示
+□ 测试管理员登录功能
+□ 测试课程浏览和测验功能
+□ 检查跨浏览器兼容性
+
+注意事项
+--------
+1. 保持文件夹结构完整，不要随意移动文件
+2. 修改文件时建议先备份原文件
+3. 图片文件较大，备份时注意存储空间
+4. JavaScript文件包含重要功能逻辑，修改需谨慎
+5. 部署到服务器时确保文件权限设置正确
+
+技术要求
+--------
+- Web服务器: 支持静态文件服务
+- 浏览器: 现代浏览器(Chrome, Firefox, Safari, Edge)
+- 网络: 建议宽带连接以确保图片加载速度
+
+联系信息
+--------
+如需技术支持或有疑问，请参考项目说明文档.md文件

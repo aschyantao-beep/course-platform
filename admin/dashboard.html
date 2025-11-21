@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员界面 - 海外运营培训课程教学平台</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- 顶部导航栏 -->
+        <header class="top-navbar">
+            <div class="navbar-left">
+                <h1 class="dashboard-title">
+                    <i class="fas fa-tachometer-alt"></i>
+                    管理员界面
+                </h1>
+            </div>
+            <div class="navbar-center">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索用户、课程..." id="global-search">
+                </div>
+            </div>
+            <div class="navbar-right">
+                <div class="user-profile">
+                    <div class="avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <span class="username" id="admin-username">songchunyan</span>
+                    <div class="dropdown">
+                        <button class="dropdown-btn">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-user"></i>
+                                个人资料
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                设置
+                            </a>
+                            <hr class="dropdown-divider">
+                            <a href="../index.html" class="dropdown-item logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                退出登录
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="main-dashboard">
+            <!-- 用户答题情况 -->
+            <section class="quiz-analytics">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-chart-line"></i>
+                        用户答题情况
+                    </h2>
+                    <div class="section-actions">
+                        <button class="refresh-btn" onclick="refreshQuizData()">
+                            <i class="fas fa-sync-alt"></i>
+                            刷新数据
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 数据看板 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="total-questions">0</h3>
+                            <p class="stat-label">答题总数</p>
+                        </div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+12%</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="accuracy-rate">0%</h3>
+                            <p class="stat-label">平均正确率</p>
+                        </div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+5%</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="average-score">0</h3>
+                            <p class="stat-label">平均分数</p>
+                        </div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+8%</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-number" id="active-users">0</h3>
+                            <p class="stat-label">活跃用户</p>
+                        </div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+15%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 排行榜表格 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>用户答题排行榜</h3>
+                        <div class="table-controls">
+                            <select id="sort-by" class="sort-select">
+                                <option value="score">按分数排序</option>
+                                <option value="accuracy">按正确率排序</option>
+                                <option value="questions">按答题数排序</option>
+                            </select>
+                            <button class="filter-btn" onclick="toggleFilters()">
+                                <i class="fas fa-filter"></i>
+                                筛选
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="quiz-leaderboard">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-sort="rank">
+                                        <span>排名</span>
+                                        <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th class="sortable" data-sort="name">
+                                        <span>用户姓名</span>
+                                        <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th class="sortable" data-sort="questions">
+                                        <span>已答题数</span>
+                                        <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th class="sortable" data-sort="accuracy">
+                                        <span>正确率</span>
+                                        <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th class="sortable" data-sort="score">
+                                        <span>平均分</span>
+                                        <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th>最后答题时间</th>
+                                </tr>
+                            </thead>
+                            <tbody id="quiz-leaderboard-body">
+                                <!-- 数据将通过JavaScript动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 课程学习进度 -->
+            <section class="learning-progress">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-graduation-cap"></i>
+                        课程学习进度
+                    </h2>
+                    <div class="section-actions">
+                        <button class="export-btn" onclick="exportProgressData()">
+                            <i class="fas fa-download"></i>
+                            导出数据
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 进度总览 -->
+                <div class="progress-overview">
+                    <div class="progress-chart-container">
+                        <div class="chart-wrapper">
+                            <canvas id="overall-progress-chart"></canvas>
+                        </div>
+                        <div class="progress-summary">
+                            <h3>整体完成率</h3>
+                            <div class="progress-percentage" id="overall-completion">0%</div>
+                            <div class="progress-details">
+                                <div class="detail-item">
+                                    <span class="label">已完成课程</span>
+                                    <span class="value" id="completed-courses">0</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">进行中课程</span>
+                                    <span class="value" id="in-progress-courses">0</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">未开始课程</span>
+                                    <span class="value" id="not-started-courses">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 用户进度表格 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>用户学习进度详情</h3>
+                        <div class="table-controls">
+                            <select id="course-filter" class="filter-select">
+                                <option value="all">所有课程</option>
+                                <option value="course1">JavaScript基础</option>
+                                <option value="course2">React开发</option>
+                                <option value="course3">Node.js后端</option>
+                                <option value="course4">Python编程</option>
+                                <option value="course5">数据库设计</option>
+                                <option value="course6">前端框架</option>
+                                <option value="course7">云计算DevOps</option>
+                                <option value="course8">移动应用开发</option>
+                                <option value="course9">区块链技术</option>
+                                <option value="course10">数据看板</option>
+                            </select>
+                            <select id="progress-filter" class="filter-select">
+                                <option value="all">所有状态</option>
+                                <option value="completed">已完成</option>
+                                <option value="in-progress">进行中</option>
+                                <option value="not-started">未开始</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table" id="progress-table">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-sort="user">
+                                        <span>用户</span>
+                                        <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th class="sortable" data-sort="course">
+                                        <span>课程名称</span>
+                                        <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th class="sortable" data-sort="progress">
+                                        <span>进度百分比</span>
+                                        <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th class="sortable" data-sort="time">
+                                        <span>学习时长</span>
+                                        <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th class="sortable" data-sort="status">
+                                        <span>状态</span>
+                                        <i class="fas fa-sort"></i>
+                                    </th>
+                                    <th>最后访问</th>
+                                </tr>
+                            </thead>
+                            <tbody id="progress-table-body">
+                                <!-- 数据将通过JavaScript动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 底部统计概览 -->
+            <footer class="dashboard-footer">
+                <div class="footer-stats">
+                    <div class="footer-stat">
+                        <span class="stat-label">总用户数</span>
+                        <span class="stat-value" id="total-users">0</span>
+                    </div>
+                    <div class="footer-stat">
+                        <span class="stat-label">今日活跃</span>
+                        <span class="stat-value" id="daily-active">0</span>
+                    </div>
+                    <div class="footer-stat">
+                        <span class="stat-label">本周新增</span>
+                        <span class="stat-value" id="weekly-new">0</span>
+                    </div>
+                    <div class="footer-stat">
+                        <span class="stat-label">数据更新时间</span>
+                        <span class="stat-value" id="last-update">--</span>
+                    </div>
+                </div>
+                <div class="pagination" id="pagination">
+                    <!-- 分页控件将通过JavaScript动态生成 -->
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- 筛选面板 -->
+    <div id="filter-panel" class="filter-panel">
+        <div class="filter-content">
+            <h3>高级筛选</h3>
+            <div class="filter-group">
+                <label>时间范围</label>
+                <select id="time-range">
+                    <option value="today">今天</option>
+                    <option value="week">本周</option>
+                    <option value="month">本月</option>
+                    <option value="all">全部</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>正确率范围</label>
+                <div class="range-inputs">
+                    <input type="number" id="accuracy-min" placeholder="最低" min="0" max="100">
+                    <span>-</span>
+                    <input type="number" id="accuracy-max" placeholder="最高" min="0" max="100">
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="apply-filters-btn" onclick="applyFilters()">应用筛选</button>
+                <button class="clear-filters-btn" onclick="clearFilters()">清除筛选</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

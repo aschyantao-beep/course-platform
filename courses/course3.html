@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第三期：React框架入门 - 课程详情</title>
+    <link rel="stylesheet" href="../css/course-detail.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- 导航�?-->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-graduation-cap"></i>
+                <span>编程教学平台</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.html">首页</a></li>
+                <li><a href="../index.html#courses">课程列表</a></li>
+                <li><a href="../quiz.html">课后测验</a></li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 课程英雄区域 -->
+    <section class="course-hero">
+        <div class="container">
+            <div class="course-info">
+                <h1>第三期：前端框架实战</h1>
+                <p class="course-subtitle">深入学习React和Vue框架，构建现代化前端应用</p>
+                <div class="course-meta">
+                    <span class="duration"><i class="fas fa-clock"></i> 5周课程</span>
+                    <span class="level"><i class="fas fa-signal"></i> 中级</span>
+                    <span class="students"><i class="fas fa-users"></i> 2,800+ 学员</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 课程视频区域 -->
+    <section class="course-video-section">
+        <div class="container">
+            <div class="video-container">
+                <h2>课程视频</h2>
+                <div class="video-wrapper">
+                    <video controls poster="../images/framework-course-poster.jpg">
+                        <source src="../videos/framework-intro.mp4" type="video/mp4">
+                        <source src="../videos/framework-intro.webm" type="video/webm">
+                        您的浏览器不支持视频播放。请下载视频文件：<a href="../videos/framework-intro.mp4">MP4格式</a>
+                    </video>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 学习进度区域 -->
+    <section class="learning-progress-section">
+        <div class="container">
+            <div class="progress-overview">
+                <h2>学习进度</h2>
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <h3>第三期：前端框架实战</h3>
+                        <div class="progress-stats">
+                            <div class="stat">
+                                <span class="stat-number" id="completed-lessons">0</span>
+                                <span class="stat-label">已完成课时</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number" id="total-lessons">20</span>
+                                <span class="stat-label">总课时</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number" id="study-time">0</span>
+                                <span class="stat-label">学习时长(分钟)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-main">
+                        <div class="progress-circle">
+                            <svg class="progress-ring" width="120" height="120">
+                                <circle class="progress-ring__circle" stroke="#e6e6e6" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                                <circle class="progress-ring__circle progress-ring__progress" stroke="#4CAF50" stroke-width="8" fill="transparent" r="52" cx="60" cy="60" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
+                            </svg>
+                            <div class="progress-text">
+                                <span class="progress-percentage" id="main-progress-percentage">0%</span>
+                                <span class="progress-label">完成度</span>
+                            </div>
+                        </div>
+                        <div class="progress-details">
+                            <div class="progress-bar-container">
+                                <div class="progress-item">
+                                    <span class="progress-label">第一周：React基础</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%" data-week="1"></div>
+                                    </div>
+                                    <span class="progress-value">0%</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span class="progress-label">第二周：React进阶</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%" data-week="2"></div>
+                                    </div>
+                                    <span class="progress-value">0%</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span class="progress-label">第三周：Vue基础</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%" data-week="3"></div>
+                                    </div>
+                                    <span class="progress-value">0%</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span class="progress-label">第四周：Vue进阶</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%" data-week="4"></div>
+                                    </div>
+                                    <span class="progress-value">0%</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span class="progress-label">第五周：项目实战</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%" data-week="5"></div>
+                                    </div>
+                                    <span class="progress-value">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 课程内容区域 -->
+    <section class="course-content">
+        <div class="container">
+            <div class="content-wrapper">
+                <div class="main-content">
+                    <!-- 课程介绍 -->
+                    <div class="content-section">
+                        <h2>课程介绍</h2>
+                        <p>React是Facebook开发的前端框架，已成为现代Web开发的标准。本课程将带你深入学习React的核心概念，包括组件化开发、状态管理、生命周期、Hooks等，让你能够构建高效、可维护的大型Web应用�?/p>
+                        <p>我们将通过实际项目，学习如何使用React构建现代化的单页应用（SPA）�?/p>
+                    </div>
+
+                    <!-- 课程大纲 -->
+                    <div class="content-section">
+                        <h2>课程大纲</h2>
+                        <div class="course-outline">
+                            <div class="week">
+                                <h3>第一周：React基础与JSX</h3>
+                                <ul>
+                                    <li>React核心概念与优�?/li>
+                                    <li>JSX语法与组件基础</li>
+                                    <li>props与state管理</li>
+                                    <li>事件处理与表�?/li>
+                                </ul>
+                            </div>
+                            <div class="week">
+                                <h3>第二周：组件生命周期与Hooks</h3>
+                                <ul>
+                                    <li>类组件生命周�?/li>
+                                    <li>函数组件与Hooks基础</li>
+                                    <li>useState与useEffect</li>
+                                    <li>自定义Hooks开�?/li>
+                                </ul>
+                            </div>
+                            <div class="week">
+                                <h3>第三周：路由与状态管�?/h3>
+                                <ul>
+                                    <li>React Router基础</li>
+                                    <li>路由配置与导�?/li>
+                                    <li>Context API使用</li>
+                                    <li>Redux基础概念</li>
+                                </ul>
+                            </div>
+                            <div class="week">
+                                <h3>第四周：高级特性与优化</h3>
+                                <ul>
+                                    <li>代码分割与懒加载</li>
+                                    <li>性能优化技�?/li>
+                                    <li>测试基础</li>
+                                    <li>部署与发�?/li>
+                                </ul>
+                            </div>
+                            <div class="week">
+                                <h3>第五周：项目实战</h3>
+                                <ul>
+                                    <li>待办事项管理应用</li>
+                                    <li>天气预报应用</li>
+                                    <li>电商商品展示</li>
+                                    <li>项目部署上线</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 学习目标 -->
+                    <div class="content-section">
+                        <h2>学习目标</h2>
+                        <div class="learning-goals">
+                            <div class="goal">
+                                <i class="fas fa-check-circle"></i>
+                                <span>掌握React框架的核心概念和使用方法</span>
+                            </div>
+                            <div class="goal">
+                                <i class="fas fa-check-circle"></i>
+                                <span>能够独立开发React单页应用</span>
+                            </div>
+                            <div class="goal">
+                                <i class="fas fa-check-circle"></i>
+                                <span>理解组件化开发思想</span>
+                            </div>
+                            <div class="goal">
+                                <i class="fas fa-check-circle"></i>
+                                <span>具备解决复杂前端问题的能�?/span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 侧边�?-->
+                <aside class="sidebar">
+                    <div class="course-card">
+                        <div class="card-header">
+                            <h3>课程信息</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="info-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span><strong>开课时间：</strong>随时开�?/span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock"></i>
+                                <span><strong>学习时长�?/strong>5�?/span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-signal"></i>
+                                <span><strong>难度级别�?/strong>中级</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-certificate"></i>
+                                <span><strong>结业证书�?/strong>完成后颁�?/span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-users"></i>
+                                <span><strong>学员数量�?/strong>2,800+</span>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <h3><i class="fas fa-chart-line"></i> 学习进度</h3>
+                            <div id="progress-container">
+                                <div class="progress-info">
+                                    <span class="progress-percentage">0%</span>
+                                    <span class="progress-text">尚未开始学�?/span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                                <div class="progress-milestones">
+                                    <div class="milestone">
+                                        <div class="milestone-dot"></div>
+                                        <div class="milestone-label">开�?/div>
+                                    </div>
+                                    <div class="milestone">
+                                        <div class="milestone-dot"></div>
+                                        <div class="milestone-label">25%</div>
+                                    </div>
+                                    <div class="milestone">
+                                        <div class="milestone-dot"></div>
+                                        <div class="milestone-label">50%</div>
+                                    </div>
+                                    <div class="milestone">
+                                        <div class="milestone-dot"></div>
+                                        <div class="milestone-label">75%</div>
+                                    </div>
+                                    <div class="milestone">
+                                        <div class="milestone-dot"></div>
+                                        <div class="milestone-label">完成</div>
+                                    </div>
+                                </div>
+                                <div class="progress-actions">
+                                    <button class="progress-btn" id="decrease-progress" title="减少进度">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button class="progress-btn" id="increase-progress" title="增加进度">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button class="progress-btn complete-btn" id="complete-course" title="完成课程">
+                                        <i class="fas fa-check"></i>
+                                        完成
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="enrollment-section">
+                            <button class="enroll-btn">
+                                <i class="fas fa-play"></i>
+                                立即学习
+                            </button>
+                            <p class="price">免费</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- 课程测验部分 -->
+    <section class="course-quiz">
+        <div class="container">
+            <h2>课程测验</h2>
+            <p class="quiz-intro">完成以下测验，检验您对React框架的理解程度�?/p>
+            
+            <div class="quiz-container">
+                <div class="quiz-question" data-question="1">
+                    <h3>问题 1：React是由哪家公司开发的�?/h3>
+                    <div class="quiz-options">
+                        <div class="option">
+                            <input type="radio" id="q1-a" name="q1" value="a">
+                            <label for="q1-a">Google</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q1-b" name="q1" value="b">
+                            <label for="q1-b">Facebook</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q1-c" name="q1" value="c">
+                            <label for="q1-c">Microsoft</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q1-d" name="q1" value="d">
+                            <label for="q1-d">Amazon</label>
+                        </div>
+                    </div>
+                    <div class="feedback" id="feedback-q1"></div>
+                </div>
+
+                <div class="quiz-question" data-question="2">
+                    <h3>问题 2：React中用于存储组件内部数据的是什么？</h3>
+                    <div class="quiz-options">
+                        <div class="option">
+                            <input type="radio" id="q2-a" name="q2" value="a">
+                            <label for="q2-a">props</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q2-b" name="q2" value="b">
+                            <label for="q2-b">state</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q2-c" name="q2" value="c">
+                            <label for="q2-c">context</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q2-d" name="q2" value="d">
+                            <label for="q2-d">refs</label>
+                        </div>
+                    </div>
+                    <div class="feedback" id="feedback-q2"></div>
+                </div>
+
+                <div class="quiz-question" data-question="3">
+                    <h3>问题 3：React中创建组件的主要方式是？</h3>
+                    <div class="quiz-options">
+                        <div class="option">
+                            <input type="radio" id="q3-a" name="q3" value="a">
+                            <label for="q3-a">函数组件和类组件</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q3-b" name="q3" value="b">
+                            <label for="q3-b">模板组件和动态组�?/label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q3-c" name="q3" value="c">
+                            <label for="q3-c">HTML组件和JS组件</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" id="q3-d" name="q3" value="d">
+                            <label for="q3-d">静态组件和交互组件</label>
+                        </div>
+                    </div>
+                    <div class="feedback" id="feedback-q3"></div>
+                </div>
+
+                <button class="submit-quiz" id="submit-quiz">提交答案</button>
+                <div class="quiz-results" id="quiz-results">
+                    <h3>测验结果</h3>
+                    <p>正确答案: <span id="correct-count">0</span>/3</p>
+                    <div class="progress-bar">
+                        <div class="progress" id="quiz-progress"></div>
+                    </div>
+                    <button class="retry-quiz" id="retry-quiz">重新测验</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 课程导航 -->
+    <nav class="course-navigation">
+        <div class="container">
+            <a href="course2.html" class="nav-link">
+                <i class="fas fa-arrow-left"></i>
+                上一课：JavaScript基础入门
+            </a>
+            <a href="course4.html" class="nav-link">
+                下一课：Node.js后端开�?                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 编程教学平台. 保留所有权�?</p>
+        </div>
+    </footer>
+
+    <script src="../js/course-detail.js"></script>
+    <script src="../js/course-progress.js"></script>
+</body>
+</html>
