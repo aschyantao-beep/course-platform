@@ -6,8 +6,8 @@
   "scripts": {
     "start": "python -m http.server 8000",
     "dev": "python -m http.server 8000",
-    "build": "echo 'Build complete - static files ready'",
-    "preview": "python -m http.server 8000"
+    "build": "echo 'No build required - static files'",
+    "vercel-build": "echo 'No build required - static files'"
   },
   "keywords": [
     "education",
