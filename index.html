@@ -16,7 +16,30 @@
                     <li><a href="#home">首页</a></li>
                     <li><a href="#courses">课程</a></li>
                     <li><a href="quiz.html">课后测验</a></li>
-                    <li><a href="admin/login.html" class="admin-link">管理员登录</a></li>
+                    <li class="user-menu-item">
+                        <a href="auth.html" class="user-login-link">
+                            <i class="fas fa-user"></i>
+                            <span class="login-text">登录/注册</span>
+                        </a>
+                        <div class="user-dropdown" id="user-dropdown" style="display: none;">
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <div class="user-details">
+                                    <div class="user-name" id="current-user-name">游客</div>
+                                    <div class="user-email" id="current-user-email">未登录</div>
+                                </div>
+                            </div>
+                            <div class="user-actions">
+                                <a href="#" class="action-btn" id="logout-btn" style="display: none;">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    退出登录
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li><a href="admin/login.html" class="admin-link">管理员</a></li>
                 </ul>
             </div>
         </nav>
@@ -232,7 +255,8 @@
 
     <!-- Supabase客户端必须首先加载 -->
     <script src="js/supabase-client.js"></script>
-    <!-- 然后加载学习追踪器 -->
+    <!-- 然后加载用户管理和学习追踪器 -->
+    <script src="js/user-manager.js"></script>
     <script src="js/learning-tracker.js"></script>
     <script src="js/course-progress.js"></script>
     <script src="js/learning-timer.js"></script>
