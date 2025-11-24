@@ -196,6 +196,9 @@ class LearningTracker {
             // 更新学习进度
             this.updateLearningProgress(sessionData);
 
+            // 同步到云端
+            this.syncSessionToCloud(sessionData);
+
             console.log('学习时长已保存:', sessionData);
         } catch (error) {
             console.error('保存学习时长失败:', error);
@@ -255,21 +258,94 @@ class LearningTracker {
     // 同步进度到云端
     async syncProgressToCloud(courseId, progress) {
         try {
-            if (window.dataManager && window.dataManager.auth.currentUser) {
-                const result = await window.dataManager.updateProgress(
-                    courseId,
-                    progress.lessonsCompleted,
-                    progress.totalLessons
-                );
+            // 检查用户是否已登录 - 使用正确的用户管理器路径
+            let currentUser = null;
 
-                if (result.success) {
-                    console.log('学习进度已同步到云端:', result);
+            // 检查多种可能的用户管理器路径
+            if (window.userManager && window.userManager.currentUser) {
+                currentUser = window.userManager.currentUser;
+            } else if (window.supabaseAuth && window.supabaseAuth.currentUser) {
+                currentUser = window.supabaseAuth.currentUser;
+            } else {
+                // 直接从Supabase获取当前用户
+                const { data: { session } } = await window.supabase.auth.getSession();
+                currentUser = session?.user;
+            }
+
+            if (currentUser && window.supabase) {
+                console.log('开始同步学习进度到云端:', { courseId, progress, userId: currentUser.id });
+
+                // 直接插入学习进度到Supabase
+                const { data, error } = await window.supabase
+                    .from('user_progress')
+                    .upsert({
+                        user_id: currentUser.id,
+                        course_id: courseId,
+                        lessons_completed: progress.lessonsCompleted,
+                        total_lessons: progress.totalLessons,
+                        progress_percentage: Math.round((progress.lessonsCompleted / progress.totalLessons) * 100),
+                        updated_at: new Date().toISOString()
+                    }, {
+                        onConflict: 'user_id,course_id'
+                    });
+
+                if (error) {
+                    console.error('进度云端同步失败:', error);
                 } else {
-                    console.error('进度云端同步失败:', result.error);
+                    console.log('学习进度已同步到云端:', data);
                 }
+            } else {
+                console.log('用户未登录，跳过云端同步');
             }
         } catch (error) {
             console.error('同步进度到云端失败:', error);
+        }
+    }
+
+    // 同步学习会话到云端
+    async syncSessionToCloud(sessionData) {
+        try {
+            // 检查用户是否已登录
+            let currentUser = null;
+
+            // 检查多种可能的用户管理器路径
+            if (window.userManager && window.userManager.currentUser) {
+                currentUser = window.userManager.currentUser;
+            } else if (window.supabaseAuth && window.supabaseAuth.currentUser) {
+                currentUser = window.supabaseAuth.currentUser;
+            } else {
+                // 直接从Supabase获取当前用户
+                const { data: { session } } = await window.supabase.auth.getSession();
+                currentUser = session?.user;
+            }
+
+            if (currentUser && window.supabase) {
+                console.log('开始同步学习会话到云端:', { courseId: sessionData.courseId, userId: currentUser.id });
+
+                // 直接插入学习会话到Supabase
+                const { data, error } = await window.supabase
+                    .from('learning_sessions')
+                    .insert({
+                        user_id: currentUser.id,
+                        course_id: sessionData.courseId || 'unknown',
+                        page_type: sessionData.pageInfo?.type || 'other',
+                        start_time: new Date(sessionData.startTime).toISOString(),
+                        end_time: new Date(sessionData.endTime).toISOString(),
+                        duration: Math.round(sessionData.duration / 1000), // 转换为秒
+                        is_completed: sessionData.isComplete,
+                        created_at: new Date(sessionData.timestamp).toISOString()
+                    });
+
+                if (error) {
+                    console.error('学习会话云端同步失败:', error);
+                } else {
+                    console.log('学习会话已同步到云端:', data);
+                }
+            } else {
+                console.log('用户未登录，跳过学习会话云端同步');
+            }
+        } catch (error) {
+            console.error('同步学习会话到云端失败:', error);
         }
     }
 

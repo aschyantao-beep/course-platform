@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>认证测试</title>
+</head>
+<body>
+    <h1>Supabase 认证功能测试</h1>
+    <div id="status">正在初始化...</div>
+    <div id="results"></div>
+
+    <!-- 引入Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 引入本地Supabase客户端 -->
+    <script src="js/supabase-client.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+
+            // 等待Supabase初始化
+            if (window.supabaseClientInitialized) {
+                statusDiv.innerHTML = '✅ Supabase客户端已初始化';
+            } else {
+                statusDiv.innerHTML = '⏳ 等待Supabase客户端初始化...';
+                await waitForSupabase();
+            }
+
+            // 测试认证方法是否可用
+            setTimeout(() => {
+                testAuthMethods();
+            }, 2000);
+        });
+
+        function waitForSupabase() {
+            return new Promise((resolve) => {
+                const checkInterval = setInterval(() => {
+                    if (window.supabaseClientInitialized) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+            });
+        }
+
+        function testAuthMethods() {
+            const resultsDiv = document.getElementById('results');
+            let results = '<h2>认证方法测试结果：</h2>';
+
+            try {
+                const supabase = window.supabase;
+
+                // 检查Supabase对象
+                if (supabase) {
+                    results += '✅ window.supabase 对象存在<br>';
+                } else {
+                    results += '❌ window.supabase 对象不存在<br>';
+                    return;
+                }
+
+                // 检查auth方法
+                if (supabase.auth) {
+                    results += '✅ supabase.auth 对象存在<br>';
+                } else {
+                    results += '❌ supabase.auth 对象不存在<br>';
+                    return;
+                }
+
+                // 检查signInWithPassword方法
+                if (typeof supabase.auth.signInWithPassword === 'function') {
+                    results += '✅ signInWithPassword 方法可用<br>';
+                } else {
+                    results += '❌ signInWithPassword 方法不可用<br>';
+                }
+
+                // 检查signUp方法
+                if (typeof supabase.auth.signUp === 'function') {
+                    results += '✅ signUp 方法可用<br>';
+                } else {
+                    results += '❌ signUp 方法不可用<br>';
+                }
+
+                // 检查getSession方法
+                if (typeof supabase.auth.getSession === 'function') {
+                    results += '✅ getSession 方法可用<br>';
+                } else {
+                    results += '❌ getSession 方法不可用<br>';
+                }
+
+                // 测试获取当前会话
+                supabase.auth.getSession().then(({ data, error }) => {
+                    if (error) {
+                        results += `❌ 获取会话失败: ${error.message}<br>`;
+                    } else {
+                        if (data.session) {
+                            results += `✅ 当前有活跃会话，用户: ${data.session.user.email}<br>`;
+                        } else {
+                            results += 'ℹ️ 当前无活跃会话<br>';
+                        }
+                    }
+                    resultsDiv.innerHTML = results;
+                });
+
+            } catch (error) {
+                results += `❌ 测试过程中出错: ${error.message}<br>`;
+                resultsDiv.innerHTML = results;
+            }
+        }
+    </script>
+</body>
+</html>

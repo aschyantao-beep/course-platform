@@ -321,9 +321,20 @@
         </div>
     </div>
 
-    <!-- 引入依赖脚本 -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <!-- 引入Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 引入本地脚本，确保正确加载顺序 -->
     <script src="js/supabase-client.js"></script>
+    <script>
+        // 确保Supabase客户端正确初始化
+        if (typeof window.supabase === 'undefined') {
+            console.error('Supabase客户端未正确加载');
+        } else {
+            console.log('Supabase客户端加载成功');
+            // 手动设置初始化标志
+            window.supabaseClientInitialized = true;
+        }
+    </script>
     <script src="js/auth-page.js"></script>
 </body>
 </html>

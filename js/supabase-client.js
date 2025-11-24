@@ -8,7 +8,36 @@ const SUPABASE_URL = 'https://ebylczerbbhkccfoefgk.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVieWxjemVyYmJoa2NjZm9lZmdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2OTM2MjEsImV4cCI6MjA3OTI2OTYyMX0.q7_8UU29lyMPaY-1xRoT1UeLEJFcjepcogk8rfKt8lI';
 
 // 初始化 Supabase 客户端
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabase;
+
+// 等待Supabase库加载
+function initSupabase() {
+    try {
+        if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('[Supabase] 初始化...');
+            console.log('[Supabase] 成功连接，客户端已可用');
+
+            // 设置全局引用
+            window.supabase = supabase;
+            window.supabaseClientInitialized = true;
+
+            // 触发自定义事件，通知其他模块
+            window.dispatchEvent(new CustomEvent('supabaseReady'));
+            console.log('[Supabase] 初始化完成');
+        } else {
+            console.log('[Supabase] 等待库加载...');
+            // 增加重试间隔，避免过于频繁
+            setTimeout(initSupabase, 500);
+        }
+    } catch (error) {
+        console.error('[Supabase] 初始化失败:', error);
+        setTimeout(initSupabase, 1000);
+    }
+}
+
+// 立即初始化
+initSupabase();
 
 /**
  * 用户认证相关函数

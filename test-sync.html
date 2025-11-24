@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据同步测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; border: 1px solid #007bff; background: #007bff; color: white; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; border-color: #6c757d; cursor: not-allowed; }
+        .log { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px; margin-top: 10px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
+        .stat-card { background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; color: #007bff; }
+        .stat-label { font-size: 14px; color: #6c757d; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 学习数据同步测试工具</h1>
+
+    <div class="test-section">
+        <h2>📊 连接与认证状态</h2>
+        <div id="connection-status" class="status info">检查中...</div>
+        <button onclick="checkConnection()">检查连接</button>
+        <button onclick="checkAuth()">检查认证状态</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📈 本地数据统计</h2>
+        <div class="stats" id="local-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="local-sessions">0</div>
+                <div class="stat-label">学习会话</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="local-progress">0</div>
+                <div class="stat-label">课程进度</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="local-quizzes">0</div>
+                <div class="stat-label">测验结果</div>
+            </div>
+        </div>
+        <button onclick="refreshLocalStats()">刷新本地数据</button>
+        <button onclick="clearLocalData()">清空本地数据</button>
+    </div>
+
+    <div class="test-section">
+        <h2>☁️ 云端数据统计</h2>
+        <div class="stats" id="cloud-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="cloud-sessions">-</div>
+                <div class="stat-label">云端会话</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="cloud-progress">-</div>
+                <div class="stat-label">云端进度</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="cloud-quizzes">-</div>
+                <div class="stat-label">云端测验</div>
+            </div>
+        </div>
+        <button onclick="refreshCloudStats()" id="refresh-cloud-btn" disabled>刷新云端数据</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🔄 数据同步操作</h2>
+        <div id="sync-status" class="status info">等待操作...</div>
+        <button onclick="manualSyncAll()" id="sync-all-btn" disabled>手动同步所有数据</button>
+        <button onclick="testInsertSession()" id="test-session-btn" disabled>测试插入会话</button>
+        <button onclick="testInsertProgress()" id="test-progress-btn" disabled>测试插入进度</button>
+        <button onclick="simulateLearning()" id="simulate-btn" disabled>模拟学习过程</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 操作日志</h2>
+        <div id="log" class="log">等待操作...\n</div>
+        <button onclick="clearLog()">清空日志</button>
+    </div>
+
+    <!-- 引入必要的脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+
+    <script>
+        let supabase;
+        let currentUser = null;
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('log');
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            logElement.textContent += `${timestamp} ${prefix} ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        async function waitForSupabase() {
+            return new Promise((resolve, reject) => {
+                let attempts = 0;
+                const maxAttempts = 50;
+
+                const checkInterval = setInterval(() => {
+                    attempts++;
+                    if (window.supabaseClientInitialized) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    } else if (attempts >= maxAttempts) {
+                        clearInterval(checkInterval);
+                        reject(new Error('Supabase 初始化超时'));
+                    }
+                }, 100);
+            });
+        }
+
+        async function checkConnection() {
+            const statusDiv = document.getElementById('connection-status');
+            try {
+                await waitForSupabase();
+                supabase = window.supabase;
+
+                if (supabase) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = '✅ Supabase 客户端已连接';
+                    log('Supabase 连接成功', 'success');
+                    return true;
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = '❌ Supabase 客户端未初始化';
+                    log('Supabase 客户端未初始化', 'error');
+                    return false;
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ 连接失败: ${error.message}`;
+                log(`连接检查失败: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function checkAuth() {
+            const statusDiv = document.getElementById('connection-status');
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = `❌ 获取认证状态失败: ${error.message}`;
+                    log(`认证状态检查失败: ${error.message}`, 'error');
+                    return false;
+                }
+
+                if (session && session.user) {
+                    currentUser = session.user;
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = `✅ 用户已登录: ${session.user.email}`;
+                    log(`用户已登录: ${session.user.email}`, 'success');
+
+                    // 启用需要登录的按钮
+                    document.getElementById('refresh-cloud-btn').disabled = false;
+                    document.getElementById('sync-all-btn').disabled = false;
+                    document.getElementById('test-session-btn').disabled = false;
+                    document.getElementById('test-progress-btn').disabled = false;
+                    document.getElementById('simulate-btn').disabled = false;
+
+                    return true;
+                } else {
+                    statusDiv.className = 'status info';
+                    statusDiv.textContent = 'ℹ️ 用户未登录 - 请先登录再测试数据同步';
+                    log('用户未登录，部分功能不可用', 'warning');
+                    return false;
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ 认证检查失败: ${error.message}`;
+                log(`认证检查失败: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        function refreshLocalStats() {
+            try {
+                const learningData = JSON.parse(localStorage.getItem('learningData') || '{}');
+                const courseProgress = JSON.parse(localStorage.getItem('courseProgress') || '{}');
+                const quizResults = JSON.parse(localStorage.getItem('quizResults') || '{}');
+
+                const totalSessions = Object.values(learningData).reduce((sum, sessions) => sum + sessions.length, 0);
+                const totalProgress = Object.keys(courseProgress).length;
+                const totalQuizzes = Object.keys(quizResults).length;
+
+                document.getElementById('local-sessions').textContent = totalSessions;
+                document.getElementById('local-progress').textContent = totalProgress;
+                document.getElementById('local-quizzes').textContent = totalQuizzes;
+
+                log(`本地数据统计: ${totalSessions}个学习会话, ${totalProgress}个课程进度, ${totalQuizzes}个测验结果`, 'info');
+
+            } catch (error) {
+                log(`读取本地数据失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function refreshCloudStats() {
+            if (!currentUser) {
+                log('请先登录', 'error');
+                return;
+            }
+
+            try {
+                // 统计学习会话
+                const { data: sessions, error: sessionsError } = await supabase
+                    .from('learning_sessions')
+                    .select('count')
+                    .eq('user_id', currentUser.id);
+
+                // 统计学习进度
+                const { data: progress, error: progressError } = await supabase
+                    .from('user_progress')
+                    .select('count')
+                    .eq('user_id', currentUser.id);
+
+                // 统计测验结果
+                const { data: quizzes, error: quizzesError } = await supabase
+                    .from('quiz_results')
+                    .select('count')
+                    .eq('user_id', currentUser.id);
+
+                if (sessionsError || progressError || quizzesError) {
+                    throw new Error(sessionsError?.message || progressError?.message || quizzesError?.message);
+                }
+
+                document.getElementById('cloud-sessions').textContent = sessions[0]?.count || 0;
+                document.getElementById('cloud-progress').textContent = progress[0]?.count || 0;
+                document.getElementById('cloud-quizzes').textContent = quizzes[0]?.count || 0;
+
+                log('云端数据统计刷新成功', 'success');
+
+            } catch (error) {
+                log(`刷新云端数据失败: ${error.message}`, 'error');
+            }
+        }
+
+        function clearLocalData() {
+            if (confirm('确定要清空所有本地学习数据吗？')) {
+                localStorage.removeItem('learningData');
+                localStorage.removeItem('courseProgress');
+                localStorage.removeItem('quizResults');
+                log('本地数据已清空', 'success');
+                refreshLocalStats();
+            }
+        }
+
+        async function manualSyncAll() {
+            if (!currentUser) {
+                log('请先登录', 'error');
+                return;
+            }
+
+            const syncStatusDiv = document.getElementById('sync-status');
+            syncStatusDiv.className = 'status info';
+            syncStatusDiv.textContent = '🔄 正在同步数据...';
+
+            try {
+                const learningData = JSON.parse(localStorage.getItem('learningData') || '{}');
+                const courseProgress = JSON.parse(localStorage.getItem('courseProgress') || '{}');
+
+                let syncedSessions = 0;
+                let syncedProgress = 0;
+
+                // 同步学习会话
+                for (const [date, sessions] of Object.entries(learningData)) {
+                    for (const session of sessions) {
+                        const { error } = await supabase.from('learning_sessions').insert({
+                            user_id: currentUser.id,
+                            course_id: session.courseId || 'unknown',
+                            page_type: session.pageInfo?.type || 'other',
+                            start_time: new Date(session.startTime).toISOString(),
+                            end_time: new Date(session.endTime).toISOString(),
+                            duration: Math.round(session.duration / 1000),
+                            is_completed: session.isComplete,
+                            created_at: new Date(session.timestamp).toISOString()
+                        });
+
+                        if (!error) {
+                            syncedSessions++;
+                        }
+                    }
+                }
+
+                // 同步学习进度
+                for (const [courseId, progress] of Object.entries(courseProgress)) {
+                    const { error } = await supabase.from('user_progress').upsert({
+                        user_id: currentUser.id,
+                        course_id: courseId,
+                        lessons_completed: progress.lessonsCompleted || 0,
+                        total_lessons: progress.totalLessons || 10,
+                        progress_percentage: progress.progressPercentage || 0,
+                        total_study_time: Math.round((progress.totalStudyTime || 0) / 1000),
+                        session_count: progress.sessionCount || 0,
+                        last_access_time: new Date(progress.lastAccessTime || Date.now()).toISOString()
+                    }, {
+                        onConflict: 'user_id,course_id'
+                    });
+
+                    if (!error) {
+                        syncedProgress++;
+                    }
+                }
+
+                syncStatusDiv.className = 'status success';
+                syncStatusDiv.textContent = `✅ 同步完成: ${syncedSessions}个会话, ${syncedProgress}个进度`;
+                log(`数据同步完成: ${syncedSessions}个会话, ${syncedProgress}个进度`, 'success');
+
+                // 刷新统计
+                refreshLocalStats();
+                refreshCloudStats();
+
+            } catch (error) {
+                syncStatusDiv.className = 'status error';
+                syncStatusDiv.textContent = `❌ 同步失败: ${error.message}`;
+                log(`数据同步失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function testInsertSession() {
+            if (!currentUser) {
+                log('请先登录', 'error');
+                return;
+            }
+
+            try {
+                const testData = {
+                    user_id: currentUser.id,
+                    course_id: 'test-course-1',
+                    page_type: 'course',
+                    start_time: new Date(Date.now() - 60000).toISOString(),
+                    end_time: new Date().toISOString(),
+                    duration: 60,
+                    is_completed: true
+                };
+
+                const { data, error } = await supabase.from('learning_sessions').insert(testData);
+
+                if (error) {
+                    throw error;
+                }
+
+                log('测试学习会话插入成功', 'success');
+                refreshCloudStats();
+
+            } catch (error) {
+                log(`测试插入失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function testInsertProgress() {
+            if (!currentUser) {
+                log('请先登录', 'error');
+                return;
+            }
+
+            try {
+                const testData = {
+                    user_id: currentUser.id,
+                    course_id: 'test-course-1',
+                    lessons_completed: 1,
+                    total_lessons: 10,
+                    progress_percentage: 10,
+                    total_study_time: 60,
+                    session_count: 1
+                };
+
+                const { data, error } = await supabase.from('user_progress').upsert(testData, {
+                    onConflict: 'user_id,course_id'
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                log('测试学习进度插入成功', 'success');
+                refreshCloudStats();
+
+            } catch (error) {
+                log(`测试插入失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function simulateLearning() {
+            if (!currentUser) {
+                log('请先登录', 'error');
+                return;
+            }
+
+            const syncStatusDiv = document.getElementById('sync-status');
+            syncStatusDiv.className = 'status info';
+            syncStatusDiv.textContent = '🎯 模拟学习过程中...';
+
+            try {
+                log('开始模拟学习过程', 'info');
+
+                // 模拟学习会话
+                const sessionData = {
+                    userId: currentUser.id,
+                    pageInfo: { type: 'course', title: '测试课程' },
+                    courseId: 'test-course-simulate',
+                    duration: 120000, // 2分钟
+                    startTime: Date.now() - 120000,
+                    endTime: Date.now(),
+                    isComplete: true,
+                    timestamp: Date.now()
+                };
+
+                // 保存到本地存储
+                let learningData = JSON.parse(localStorage.getItem('learningData') || '{}');
+                const today = new Date().toISOString().split('T')[0];
+                if (!learningData[today]) {
+                    learningData[today] = [];
+                }
+                learningData[today].push(sessionData);
+                localStorage.setItem('learningData', JSON.stringify(learningData));
+
+                // 直接同步到云端
+                const { data: sessionResult, error: sessionError } = await supabase
+                    .from('learning_sessions')
+                    .insert({
+                        user_id: currentUser.id,
+                        course_id: sessionData.courseId,
+                        page_type: sessionData.pageInfo.type,
+                        start_time: new Date(sessionData.startTime).toISOString(),
+                        end_time: new Date(sessionData.endTime).toISOString(),
+                        duration: Math.round(sessionData.duration / 1000),
+                        is_completed: sessionData.isComplete,
+                        created_at: new Date(sessionData.timestamp).toISOString()
+                    });
+
+                if (sessionError) {
+                    throw sessionError;
+                }
+
+                // 模拟学习进度
+                const progressData = {
+                    courseId: sessionData.courseId,
+                    totalStudyTime: sessionData.duration,
+                    sessionCount: 1,
+                    lastAccessTime: sessionData.timestamp,
+                    lessonsCompleted: 1,
+                    totalLessons: 10,
+                    progressPercentage: 10
+                };
+
+                // 保存到本地存储
+                let courseProgress = JSON.parse(localStorage.getItem('courseProgress') || '{}');
+                courseProgress[sessionData.courseId] = progressData;
+                localStorage.setItem('courseProgress', JSON.stringify(courseProgress));
+
+                // 同步到云端
+                const { data: progressResult, error: progressError } = await supabase
+                    .from('user_progress')
+                    .upsert({
+                        user_id: currentUser.id,
+                        course_id: progressData.courseId,
+                        lessons_completed: progressData.lessonsCompleted,
+                        total_lessons: progressData.totalLessons,
+                        progress_percentage: progressData.progressPercentage,
+                        total_study_time: Math.round(progressData.totalStudyTime / 1000),
+                        session_count: progressData.sessionCount,
+                        last_access_time: new Date(progressData.lastAccessTime).toISOString()
+                    }, {
+                        onConflict: 'user_id,course_id'
+                    });
+
+                if (progressError) {
+                    throw progressError;
+                }
+
+                syncStatusDiv.className = 'status success';
+                syncStatusDiv.textContent = '✅ 模拟学习完成，数据已同步';
+                log('模拟学习完成，学习会话和进度已同步到云端', 'success');
+
+                // 刷新统计
+                refreshLocalStats();
+                refreshCloudStats();
+
+            } catch (error) {
+                syncStatusDiv.className = 'status error';
+                syncStatusDiv.textContent = `❌ 模拟学习失败: ${error.message}`;
+                log(`模拟学习失败: ${error.message}`, 'error');
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+
+        // 页面加载时自动初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            log('测试工具加载完成', 'success');
+
+            setTimeout(async () => {
+                const connected = await checkConnection();
+                if (connected) {
+                    await checkAuth();
+                    refreshLocalStats();
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

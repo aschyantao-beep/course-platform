@@ -6,6 +6,8 @@
     <title>海外运营培训课程教学平台</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 引入Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <header>
@@ -255,6 +257,74 @@
 
     <!-- Supabase客户端必须首先加载 -->
     <script src="js/supabase-client.js"></script>
+    <!-- 添加简单的用户状态检测脚本 -->
+    <script>
+        // 等待Supabase初始化并检查用户状态
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('首页开始检查用户状态...');
+
+            // 等待Supabase初始化
+            const checkSupabase = () => {
+                if (window.supabaseClientInitialized) {
+                    checkUserStatus();
+                } else {
+                    setTimeout(checkSupabase, 100);
+                }
+            };
+            checkSupabase();
+        });
+
+        async function checkUserStatus() {
+            try {
+                console.log('开始检查认证状态...');
+                const { data: { session }, error } = await window.supabase.auth.getSession();
+
+                if (error) {
+                    console.error('检查认证状态失败:', error);
+                    return;
+                }
+
+                if (session && session.user) {
+                    console.log('用户已登录:', session.user.email);
+                    updateUserUI(session.user);
+                } else {
+                    console.log('用户未登录');
+                    updateUserUI(null);
+                }
+            } catch (error) {
+                console.error('用户状态检查异常:', error);
+            }
+        }
+
+        function updateUserUI(user) {
+            const loginLink = document.querySelector('.user-login-link');
+            const dropdown = document.getElementById('user-dropdown');
+            const userName = document.getElementById('current-user-name');
+            const userEmail = document.getElementById('current-user-email');
+
+            if (user) {
+                // 显示用户信息
+                if (userName) userName.textContent = user.user_metadata?.name || user.email.split('@')[0];
+                if (userEmail) userEmail.textContent = user.email;
+
+                if (loginLink) {
+                    loginLink.style.display = 'none';
+                }
+                if (dropdown) {
+                    dropdown.style.display = 'block';
+                }
+                console.log('用户界面更新完成');
+            } else {
+                // 显示登录链接
+                if (loginLink) {
+                    loginLink.style.display = 'block';
+                }
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                }
+            }
+        }
+    </script>
     <!-- 然后加载用户管理和学习追踪器 -->
     <script src="js/user-manager.js"></script>
     <script src="js/learning-tracker.js"></script>

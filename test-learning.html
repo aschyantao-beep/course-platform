@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习测试页面</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- 引入Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .status { padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .log { background: #f8f9fa; padding: 10px; border-radius: 5px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; margin: 10px 0; }
+        .course-content { border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>📚 学员管理&业务绩效&产品规则 - 学习测试页面</h1>
+
+    <div id="status" class="status info">准备开始学习...</div>
+
+    <div class="course-content">
+        <h2>课程内容：学员管理&业务绩效&产品规则</h2>
+        <p>这是一个模拟的学习页面，用于测试学习数据同步功能。</p>
+        <p>请在此页面停留至少30秒，然后点击"结束学习"按钮。</p>
+        <div id="timer">学习时长: 0秒</div>
+    </div>
+
+    <button onclick="startLearning()">开始学习</button>
+    <button onclick="endLearning()">结束学习</button>
+    <button onclick="checkSyncStatus()">检查同步状态</button>
+    <button onclick="window.location.href='index.html'">返回首页</button>
+
+    <h3>📝 学习日志:</h3>
+    <div id="log" class="log">等待学习开始...</div>
+
+    <script src="js/supabase-client.js"></script>
+    <script src="js/learning-tracker.js"></script>
+
+    <script>
+        let startTime = null;
+        let learningTimer = null;
+        let currentUser = null;
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logDiv = document.getElementById('log');
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            logDiv.innerHTML += `${timestamp} ${prefix} ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+        }
+
+        function startLearning() {
+            log('开始学习课程：学员管理&业务绩效&产品规则', 'info');
+            updateStatus('正在学习中...', 'info');
+            startTime = Date.now();
+
+            // 启动计时器
+            learningTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('timer').textContent = `学习时长: ${elapsed}秒`;
+            }, 1000);
+
+            // 手动触发学习记录
+            if (window.learningTracker) {
+                window.learningTracker.startLearning('course2', '学员管理&业务绩效&产品规则');
+                log('学习追踪器已启动', 'success');
+            } else {
+                log('学习追踪器未加载，使用手动记录', 'warning');
+            }
+        }
+
+        async function endLearning() {
+            if (!startTime) {
+                log('请先开始学习', 'error');
+                return;
+            }
+
+            clearInterval(learningTimer);
+            const duration = Date.now() - startTime;
+            const durationSeconds = Math.floor(duration / 1000);
+
+            log(`结束学习，总时长: ${durationSeconds}秒`, 'info');
+            updateStatus('正在保存学习数据...', 'info');
+
+            try {
+                // 手动保存学习会话
+                await saveLearningSession(durationSeconds);
+                log('学习会话保存成功', 'success');
+
+                // 手动保存学习进度
+                await saveLearningProgress();
+                log('学习进度保存成功', 'success');
+
+                updateStatus('学习数据保存完成！', 'success');
+
+            } catch (error) {
+                log(`保存学习数据失败: ${error.message}`, 'error');
+                updateStatus(`保存失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function saveLearningSession(durationSeconds) {
+            // 等待用户认证
+            const { data: { session } } = await window.supabase.auth.getSession();
+            if (!session) {
+                throw new Error('用户未登录');
+            }
+
+            const sessionData = {
+                user_id: session.user.id,
+                course_id: 'course2',
+                page_type: 'course',
+                start_time: new Date(startTime).toISOString(),
+                end_time: new Date().toISOString(),
+                duration: durationSeconds,
+                is_completed: durationSeconds >= 30,
+                created_at: new Date().toISOString()
+            };
+
+            log(`准备保存学习会话数据: ${JSON.stringify(sessionData)}`, 'info');
+
+            const { data, error } = await window.supabase
+                .from('learning_sessions')
+                .insert(sessionData)
+                .select();  // 添加 .select() 来返回插入的数据
+
+            if (error) {
+                log(`数据库插入错误: ${error.message}`, 'error');
+                throw error;
+            }
+
+            log(`学习会话已同步到云端，返回数据: ${JSON.stringify(data)}`, 'success');
+            return data;
+        }
+
+        async function saveLearningProgress() {
+            // 等待用户认证
+            const { data: { session } } = await window.supabase.auth.getSession();
+            if (!session) {
+                throw new Error('用户未登录');
+            }
+
+            const progressData = {
+                user_id: session.user.id,
+                course_id: 'course2',
+                lessons_completed: 1,
+                total_lessons: 10,
+                progress_percentage: 10,
+                total_study_time: Math.floor((Date.now() - startTime) / 1000),
+                session_count: 1,
+                last_access_time: new Date().toISOString()
+            };
+
+            log(`准备保存学习进度数据: ${JSON.stringify(progressData)}`, 'info');
+
+            const { data, error } = await window.supabase
+                .from('user_progress')
+                .upsert(progressData, {
+                    onConflict: 'user_id,course_id'
+                })
+                .select();  // 添加 .select() 来返回插入的数据
+
+            if (error) {
+                log(`进度插入错误: ${error.message}`, 'error');
+                throw error;
+            }
+
+            log(`学习进度已同步到云端，返回数据: ${JSON.stringify(data)}`, 'success');
+            return data;
+        }
+
+        async function checkSyncStatus() {
+            log('检查云端同步状态...', 'info');
+
+            try {
+                const { data: { session } } = await window.supabase.auth.getSession();
+                if (!session) {
+                    log('用户未登录', 'error');
+                    return;
+                }
+
+                // 检查学习会话
+                const { data: sessions, error: sessionError } = await window.supabase
+                    .from('learning_sessions')
+                    .select('*')
+                    .eq('user_id', session.user.id)
+                    .eq('course_id', 'course2')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                // 检查学习进度
+                const { data: progress, error: progressError } = await window.supabase
+                    .from('user_progress')
+                    .select('*')
+                    .eq('user_id', session.user.id)
+                    .eq('course_id', 'course2')
+                    .single();
+
+                if (sessionError || progressError) {
+                    log(`查询数据失败: ${sessionError?.message || progressError?.message}`, 'error');
+                    return;
+                }
+
+                log(`云端数据查询成功:`, 'success');
+                log(`- 学习会话数量: ${sessions.length}`, 'info');
+                if (progress) {
+                    log(`- 学习进度: ${progress.progress_percentage}%`, 'info');
+                    log(`- 总学习时间: ${progress.total_study_time}秒`, 'info');
+                }
+
+            } catch (error) {
+                log(`检查同步状态失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 页面加载时检查用户状态
+        document.addEventListener('DOMContentLoaded', async function() {
+            log('学习测试页面加载完成', 'info');
+
+            try {
+                // 等待Supabase初始化
+                await new Promise((resolve) => {
+                    const checkInterval = setInterval(() => {
+                        if (window.supabaseClientInitialized) {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }, 100);
+                });
+
+                // 检查用户登录状态
+                const { data: { session } } = await window.supabase.auth.getSession();
+                if (session) {
+                    currentUser = session.user;
+                    log(`用户已登录: ${session.user.email}`, 'success');
+                    updateStatus(`欢迎回来，${session.user.email}！`, 'success');
+                } else {
+                    log('用户未登录，请先登录', 'warning');
+                    updateStatus('用户未登录，请先登录', 'error');
+                }
+            } catch (error) {
+                log(`初始化失败: ${error.message}`, 'error');
+                updateStatus(`初始化失败: ${error.message}`, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

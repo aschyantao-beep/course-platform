@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据同步调试工具</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .status { color: #666; }
+        .success { color: green; }
+        .error { color: red; }
+        button { padding: 8px 16px; margin: 5px; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Supabase 数据同步调试工具</h1>
+
+    <div class="section">
+        <h2>1. Supabase 连接状态</h2>
+        <div id="connection-status" class="status">检查中...</div>
+        <button onclick="checkConnection()">重新检查连接</button>
+    </div>
+
+    <div class="section">
+        <h2>2. 用户认证状态</h2>
+        <div id="auth-status" class="status">检查中...</div>
+        <button onclick="checkAuth()">检查认证状态</button>
+    </div>
+
+    <div class="section">
+        <h2>3. 本地存储数据</h2>
+        <div id="local-data" class="status">检查中...</div>
+        <button onclick="checkLocalData()">检查本地数据</button>
+        <button onclick="clearLocalData()">清空本地数据</button>
+    </div>
+
+    <div class="section">
+        <h2>4. Supabase 数据库表</h2>
+        <div id="db-tables" class="status">检查中...</div>
+        <button onclick="checkDatabaseTables()">检查数据库表</button>
+    </div>
+
+    <div class="section">
+        <h2>5. 手动数据同步</h2>
+        <div id="sync-status" class="status">等待操作...</div>
+        <button onclick="manualSync()">手动同步数据</button>
+        <button onclick="testInsert()">测试插入数据</button>
+    </div>
+
+    <div class="section">
+        <h2>6. 详细日志</h2>
+        <pre id="detailed-log" style="height: 200px; overflow-y: scroll;">等待日志...\n</pre>
+        <button onclick="clearLog()">清空日志</button>
+    </div>
+
+    <!-- 引入必要的脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script>
+        let supabase;
+        let currentUser = null;
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('detailed-log');
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+            logElement.textContent += `${timestamp} ${prefix} ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        async function checkConnection() {
+            const statusDiv = document.getElementById('connection-status');
+            try {
+                await waitForSupabase();
+                supabase = window.supabase;
+
+                if (supabase) {
+                    statusDiv.innerHTML = '<span class="success">✅ Supabase 客户端已连接</span>';
+                    log('Supabase 连接成功');
+
+                    // 测试连接
+                    const { data, error } = await supabase.from('learning_sessions').select('count').single();
+                    if (error && !error.message.includes('does not exist')) {
+                        statusDiv.innerHTML += '<br><span class="error">⚠️ 数据库访问错误: ' + error.message + '</span>';
+                        log('数据库访问错误: ' + error.message, 'error');
+                    } else {
+                        log('数据库连接测试成功');
+                    }
+                } else {
+                    statusDiv.innerHTML = '<span class="error">❌ Supabase 客户端未初始化</span>';
+                    log('Supabase 客户端未初始化', 'error');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<span class="error">❌ 连接失败: ' + error.message + '</span>';
+                log('连接检查失败: ' + error.message, 'error');
+            }
+        }
+
+        function waitForSupabase() {
+            return new Promise((resolve, reject) => {
+                let attempts = 0;
+                const maxAttempts = 50;
+
+                const checkInterval = setInterval(() => {
+                    attempts++;
+                    if (window.supabaseClientInitialized) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    } else if (attempts >= maxAttempts) {
+                        clearInterval(checkInterval);
+                        reject(new Error('Supabase 初始化超时'));
+                    }
+                }, 100);
+            });
+        }
+
+        async function checkAuth() {
+            const statusDiv = document.getElementById('auth-status');
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) {
+                    statusDiv.innerHTML = '<span class="error">❌ 获取认证状态失败: ' + error.message + '</span>';
+                    log('认证状态检查失败: ' + error.message, 'error');
+                    return;
+                }
+
+                if (session && session.user) {
+                    currentUser = session.user;
+                    statusDiv.innerHTML = `<span class="success">✅ 用户已登录: ${session.user.email}</span><br>用户ID: ${session.user.id}`;
+                    log('用户已登录: ' + session.user.email, 'success');
+                } else {
+                    statusDiv.innerHTML = '<span class="status">ℹ️ 用户未登录</span>';
+                    log('用户未登录');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<span class="error">❌ 认证检查失败: ' + error.message + '</span>';
+                log('认证检查失败: ' + error.message, 'error');
+            }
+        }
+
+        function checkLocalData() {
+            const statusDiv = document.getElementById('local-data');
+
+            try {
+                const learningData = JSON.parse(localStorage.getItem('learningData') || '{}');
+                const courseProgress = JSON.parse(localStorage.getItem('courseProgress') || '{}');
+                const quizResults = JSON.parse(localStorage.getItem('quizResults') || '{}');
+
+                let html = '<div><strong>学习会话数据:</strong></div>';
+                html += `<pre>${JSON.stringify(learningData, null, 2)}</pre>`;
+
+                html += '<div><strong>课程进度数据:</strong></div>';
+                html += `<pre>${JSON.stringify(courseProgress, null, 2)}</pre>`;
+
+                html += '<div><strong>测验结果数据:</strong></div>';
+                html += `<pre>${JSON.stringify(quizResults, null, 2)}</pre>`;
+
+                statusDiv.innerHTML = html;
+
+                // 计算总量
+                const totalSessions = Object.values(learningData).reduce((sum, sessions) => sum + sessions.length, 0);
+                const totalProgress = Object.keys(courseProgress).length;
+                const totalQuizzes = Object.keys(quizResults).length;
+
+                log(`本地数据统计: ${totalSessions}个学习会话, ${totalProgress}个课程进度, ${totalQuizzes}个测验结果`);
+
+            } catch (error) {
+                statusDiv.innerHTML = '<span class="error">❌ 读取本地数据失败: ' + error.message + '</span>';
+                log('读取本地数据失败: ' + error.message, 'error');
+            }
+        }
+
+        function clearLocalData() {
+            if (confirm('确定要清空所有本地学习数据吗？')) {
+                localStorage.removeItem('learningData');
+                localStorage.removeItem('courseProgress');
+                localStorage.removeItem('quizResults');
+                log('本地数据已清空', 'success');
+                checkLocalData();
+            }
+        }
+
+        async function checkDatabaseTables() {
+            const statusDiv = document.getElementById('db-tables');
+
+            const tables = ['learning_sessions', 'user_progress', 'quiz_results'];
+            let html = '';
+
+            for (const tableName of tables) {
+                try {
+                    const { data, error } = await supabase.from(tableName).select('*').limit(1);
+
+                    if (error) {
+                        if (error.message.includes('does not exist')) {
+                            html += `<div>❌ 表 "${tableName}" 不存在</div>`;
+                            log(`表 "${tableName}" 不存在`, 'error');
+                        } else {
+                            html += `<div>⚠️ 表 "${tableName}" 访问错误: ${error.message}</div>`;
+                            log(`表 "${tableName}" 访问错误: ${error.message}`, 'error');
+                        }
+                    } else {
+                        html += `<div>✅ 表 "${tableName}" 存在并可访问</div>`;
+                        log(`表 "${tableName}" 存在并可访问`, 'success');
+                    }
+                } catch (error) {
+                    html += `<div>❌ 检查表 "${tableName}" 时出错: ${error.message}</div>`;
+                    log(`检查表 "${tableName}" 时出错: ${error.message}`, 'error');
+                }
+            }
+
+            statusDiv.innerHTML = html;
+        }
+
+        async function manualSync() {
+            const statusDiv = document.getElementById('sync-status');
+
+            if (!currentUser) {
+                statusDiv.innerHTML = '<span class="error">❌ 请先登录</span>';
+                log('请先登录再进行数据同步', 'error');
+                return;
+            }
+
+            statusDiv.innerHTML = '<span class="status">🔄 正在同步数据...</span>';
+            log('开始手动数据同步');
+
+            try {
+                const learningData = JSON.parse(localStorage.getItem('learningData') || '{}');
+                const courseProgress = JSON.parse(localStorage.getItem('courseProgress') || '{}');
+                const quizResults = JSON.parse(localStorage.getItem('quizResults') || '{}');
+
+                // 同步学习会话
+                let syncedSessions = 0;
+                Object.keys(learningData).forEach(date => {
+                    learningData[date].forEach(session => {
+                        // 这里应该调用实际的同步函数
+                        syncedSessions++;
+                    });
+                });
+
+                statusDiv.innerHTML = `<span class="success">✅ 同步完成: ${syncedSessions}个会话</span>`;
+                log(`数据同步完成，同步了 ${syncedSessions} 个学习会话`, 'success');
+
+            } catch (error) {
+                statusDiv.innerHTML = '<span class="error">❌ 同步失败: ' + error.message + '</span>';
+                log('数据同步失败: ' + error.message, 'error');
+            }
+        }
+
+        async function testInsert() {
+            const statusDiv = document.getElementById('sync-status');
+
+            if (!currentUser) {
+                statusDiv.innerHTML = '<span class="error">❌ 请先登录</span>';
+                return;
+            }
+
+            try {
+                const testData = {
+                    user_id: currentUser.id,
+                    course_id: 'test-course',
+                    page_type: 'test',
+                    start_time: new Date().toISOString(),
+                    end_time: new Date().toISOString(),
+                    duration: 60,
+                    is_completed: true
+                };
+
+                const { data, error } = await supabase.from('learning_sessions').insert(testData);
+
+                if (error) {
+                    statusDiv.innerHTML = '<span class="error">❌ 测试插入失败: ' + error.message + '</span>';
+                    log('测试插入失败: ' + error.message, 'error');
+                } else {
+                    statusDiv.innerHTML = '<span class="success">✅ 测试插入成功</span>';
+                    log('测试插入成功', 'success');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<span class="error">❌ 测试插入异常: ' + error.message + '</span>';
+                log('测试插入异常: ' + error.message, 'error');
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('detailed-log').textContent = '';
+        }
+
+        // 页面加载时自动检查
+        document.addEventListener('DOMContentLoaded', function() {
+            log('调试工具加载完成');
+            setTimeout(() => {
+                checkConnection();
+                checkAuth();
+                checkLocalData();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

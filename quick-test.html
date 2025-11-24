@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速连接测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .status { padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔍 快速连接测试</h1>
+
+    <div id="status" class="status info">正在测试...</div>
+
+    <h2>📝 测试结果:</h2>
+    <pre id="results">等待测试结果...</pre>
+
+    <h2>🔧 操作按钮:</h2>
+    <button onclick="testSupabaseConnection()">测试连接</button>
+    <button onclick="testAuth()">测试认证</button>
+    <button onclick="window.location.href='auth.html'">前往登录</button>
+    <button onclick="window.location.href='index.html'">返回首页</button>
+
+    <!-- 直接引入Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        console.log('页面加载开始');
+
+        // 直接在这里初始化Supabase
+        const SUPABASE_URL = 'https://ebylczerbbhkccfoefgk.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVieWxjemVyYmJoa2NjZm9lZmdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2OTM2MjEsImV4cCI6MjA3OTI2OTYyMX0.q7_8UU29lyMPaY-1xRoT1UeLEJFcjepcogk8rfKt8lI';
+
+        let supabase;
+        let testResults = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            testResults.push(`[${timestamp}] ${message}`);
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.textContent = testResults.join('\n');
+
+            const statusDiv = document.getElementById('status');
+            if (type === 'error') {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ ${message}`;
+            } else if (type === 'success') {
+                statusDiv.className = 'status success';
+                statusDiv.textContent = `✅ ${message}`;
+            } else {
+                statusDiv.className = 'status info';
+                statusDiv.textContent = `ℹ️ ${message}`;
+            }
+
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        async function testSupabaseConnection() {
+            log('开始测试Supabase连接...');
+
+            try {
+                if (typeof window.supabase === 'undefined') {
+                    log('❌ Supabase CDN库未加载', 'error');
+                    return;
+                }
+
+                log('✅ Supabase CDN库已加载');
+
+                // 尝试创建客户端
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                log('✅ Supabase客户端创建成功');
+
+                // 测试连接
+                const { data, error } = await supabase.from('learning_sessions').select('count').limit(1);
+
+                if (error) {
+                    log(`⚠️ 数据库连接测试: ${error.message}`, 'error');
+                } else {
+                    log('✅ 数据库连接测试成功', 'success');
+                }
+
+                log('✅ Supabase连接测试完成', 'success');
+
+            } catch (error) {
+                log(`❌ Supabase连接失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAuth() {
+            if (!supabase) {
+                log('❌ 请先测试Supabase连接', 'error');
+                return;
+            }
+
+            log('开始测试认证状态...');
+
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) {
+                    log(`❌ 获取认证状态失败: ${error.message}`, 'error');
+                } else if (session) {
+                    log(`✅ 用户已登录: ${session.user.email}`, 'success');
+                    log(`用户ID: ${session.user.id}`);
+                } else {
+                    log('ℹ️ 用户未登录', 'info');
+                }
+
+            } catch (error) {
+                log(`❌ 认证测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 页面加载时自动测试
+        document.addEventListener('DOMContentLoaded', function() {
+            log('📱 页面DOM加载完成');
+
+            setTimeout(() => {
+                testSupabaseConnection();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

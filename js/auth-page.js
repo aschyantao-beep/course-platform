@@ -10,8 +10,15 @@ class AuthPageUI {
     }
 
     init() {
-        // 检查用户是否已经登录
-        this.checkAuthStatus();
+        // 确保Supabase已加载
+        if (this.supabase && this.supabase.auth) {
+            console.log('Supabase客户端已准备就绪');
+            // 检查用户是否已经登录
+            this.checkAuthStatus();
+        } else {
+            console.error('Supabase客户端未加载');
+            this.showMessage('系统初始化失败，请刷新页面重试', 'error');
+        }
     }
 
     // 检查认证状态

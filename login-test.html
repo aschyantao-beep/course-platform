@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速登录测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: 50px auto; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0; }
+        button:hover { background: #0056b3; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🚀 快速登录测试</h1>
+
+    <div id="status" class="status info">请登录或注册</div>
+
+    <form id="login-form">
+        <div class="form-group">
+            <label for="email">邮箱:</label>
+            <input type="email" id="email" required placeholder="请输入邮箱">
+        </div>
+        <div class="form-group">
+            <label for="password">密码:</label>
+            <input type="password" id="password" required placeholder="请输入密码">
+        </div>
+        <button type="submit">登录</button>
+        <button type="button" onclick="register()">注册新账号</button>
+    </form>
+
+    <button onclick="window.location.href='index.html'">返回首页</button>
+
+    <!-- 直接引入Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // Supabase配置
+        const SUPABASE_URL = 'https://ebylczerbbhkccfoefgk.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVieWxjemVyYmJoa2NjZm9lZmdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2OTM2MjEsImV4cCI6MjA3OTI2OTYyMX0.q7_8UU29lyMPaY-1xRoT1UeLEJFcjepcogk8rfKt8lI';
+
+        // 创建Supabase客户端
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+        }
+
+        // 登录
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            showStatus('正在登录...', 'info');
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    showStatus(`登录失败: ${error.message}`, 'error');
+                } else {
+                    showStatus('登录成功！正在跳转...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                }
+            } catch (error) {
+                showStatus(`登录异常: ${error.message}`, 'error');
+            }
+        });
+
+        // 注册
+        async function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                showStatus('请填写邮箱和密码', 'error');
+                return;
+            }
+
+            showStatus('正在注册...', 'info');
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    showStatus(`注册失败: ${error.message}`, 'error');
+                } else {
+                    showStatus('注册成功！请检查邮箱验证链接', 'success');
+                }
+            } catch (error) {
+                showStatus(`注册异常: ${error.message}`, 'error');
+            }
+        }
+
+        // 检查是否已经登录
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                showStatus(`您已经登录: ${session.user.email}`, 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        }
+
+        // 页面加载时检查认证状态
+        document.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+</html>
