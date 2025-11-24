@@ -258,7 +258,13 @@ class LearningTracker {
     // 同步进度到云端
     async syncProgressToCloud(courseId, progress) {
         try {
-            // 检查用户是否已登录 - 使用正确的用户管理器路径
+            // 确保courseId有效
+            if (!courseId || courseId === 'undefined' || courseId === 'null' || courseId === 'unknown') {
+                console.warn('无效的courseId，跳过同步:', courseId);
+                return;
+            }
+
+            // 检查用户是否已登录
             let currentUser = null;
 
             // 检查多种可能的用户管理器路径
@@ -275,30 +281,54 @@ class LearningTracker {
             if (currentUser && window.supabase) {
                 console.log('开始同步学习进度到云端:', { courseId, progress, userId: currentUser.id });
 
-                // 直接插入学习进度到Supabase
+                // 确保进度数据完整性
+                const progressPercentage = Math.round((progress.lessonsCompleted / progress.totalLessons) * 100);
+                const totalStudyTimeSeconds = Math.round(progress.totalStudyTime / 1000);
+
+                // 准备完整的学习进度数据
+                const progressData = {
+                    user_id: currentUser.id,
+                    course_id: courseId,
+                    lessons_completed: progress.lessonsCompleted || 0,
+                    total_lessons: progress.totalLessons || 10,
+                    progress_percentage: progressPercentage,
+                    total_study_time: totalStudyTimeSeconds,
+                    session_count: progress.sessionCount || 1,
+                    last_access_time: new Date(progress.lastAccessTime || Date.now()).toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+
+                console.log('准备同步的进度数据:', progressData);
+
+                // 使用 upsert 操作同步到 Supabase
                 const { data, error } = await window.supabase
                     .from('user_progress')
-                    .upsert({
-                        user_id: currentUser.id,
-                        course_id: courseId,
-                        lessons_completed: progress.lessonsCompleted,
-                        total_lessons: progress.totalLessons,
-                        progress_percentage: Math.round((progress.lessonsCompleted / progress.totalLessons) * 100),
-                        updated_at: new Date().toISOString()
-                    }, {
+                    .upsert(progressData, {
                         onConflict: 'user_id,course_id'
-                    });
+                    })
+                    .select(); // 添加 .select() 来返回插入的数据
 
                 if (error) {
                     console.error('进度云端同步失败:', error);
+                    console.error('错误详情:', error.details, error.hint, error.message);
                 } else {
                     console.log('学习进度已同步到云端:', data);
+
+                    // 触发进度更新事件
+                    if (window.dispatchEvent) {
+                        window.dispatchEvent(new CustomEvent('progressUpdated', {
+                            detail: { courseId, progress: progressData }
+                        }));
+                    }
                 }
             } else {
-                console.log('用户未登录，跳过云端同步');
+                console.log('用户未登录或Supabase未初始化，跳过云端同步');
+                console.log('currentUser:', currentUser ? '已登录' : '未登录');
+                console.log('supabase:', window.supabase ? '已初始化' : '未初始化');
             }
         } catch (error) {
             console.error('同步进度到云端失败:', error);
+            console.error('错误堆栈:', error.stack);
         }
     }
 
@@ -487,24 +517,54 @@ function setupCourseLinkTracking() {
 
     courseLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            // 获取课程ID
-            const courseId = this.getAttribute('data-course-id');
-            const courseName = this.closest('.course-card').querySelector('h3').textContent;
+            // 获取课程ID - 多种方式尝试
+            let courseId = this.getAttribute('data-course-id');
+            const courseCard = this.closest('.course-card');
+            const courseName = courseCard.querySelector('h3').textContent;
 
-            // 保存当前学习的课程
-            localStorage.setItem('currentLearningCourse', `course${courseId}`);
-            localStorage.setItem('currentLearningCourseName', courseName);
+            // 如果没有data-course-id，从course-card的data-course获取
+            if (!courseId) {
+                const cardCourseId = courseCard.getAttribute('data-course');
+                if (cardCourseId) {
+                    courseId = cardCourseId;
+                }
+            }
 
-            console.log('开始学习课程:', courseName, 'ID:', courseId);
+            // 确保courseId有效
+            if (courseId) {
+                const fullCourseId = courseId.startsWith('course') ? courseId : `course${courseId}`;
 
-            // 记录学习开始
-            if (learningTracker) {
-                learningTracker.currentCourseId = `course${courseId}`;
-                learningTracker.currentPage.title = courseName;
-                learningTracker.startTime = Date.now();
+                // 保存当前学习的课程到多个地方确保可靠性
+                localStorage.setItem('currentLearningCourse', fullCourseId);
+                localStorage.setItem('currentCourseId', courseId); // 数字ID
+                localStorage.setItem('currentLearningCourseName', courseName);
+
+                console.log('开始学习课程:', courseName, 'ID:', courseId, '完整ID:', fullCourseId);
+
+                // 记录学习开始
+                if (learningTracker) {
+                    learningTracker.currentCourseId = fullCourseId;
+                    learningTracker.currentPage.title = courseName;
+                    learningTracker.startTime = Date.now();
+                }
+            } else {
+                console.warn('无法获取课程ID:', courseCard);
             }
         });
     });
+
+    // 页面加载时也尝试设置当前课程
+    setTimeout(() => {
+        const firstCourse = document.querySelector('.course-card[data-course]');
+        if (firstCourse) {
+            const courseId = firstCourse.getAttribute('data-course');
+            const courseName = firstCourse.querySelector('h3').textContent;
+
+            // 设置默认当前课程
+            localStorage.setItem('currentCourseId', courseId);
+            console.log('设置默认当前课程:', courseName, 'ID:', courseId);
+        }
+    }, 1000);
 }
 
 // 导出供其他模块使用
