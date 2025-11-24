@@ -111,6 +111,41 @@ main {
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
+/* 学习中心按钮特殊样式 */
+.learning-center-btn {
+    background: #28a745;
+    color: white;
+    margin-right: 1rem;
+}
+
+.learning-center-btn:hover {
+    background: #218838;
+}
+
+/* 英雄区域按钮容器 */
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* 学习中心导航链接 */
+.learning-center-link {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.learning-center-link:hover {
+    color: #a8d5ff;
+}
+
+/* 学习中心导航链接图标 */
+.learning-center-link i {
+    margin-right: 8px;
+}
+
 /* 课程部分 */
 .courses {
     padding: 4rem 0;
